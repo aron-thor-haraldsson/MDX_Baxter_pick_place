@@ -539,7 +539,7 @@ class Classifier():
         return dirs_out, files_out, figures_out
 
     # Sets the contour size limits in percentage of image size
-    def set_contour_size_limits(self, min_contour_size=0.005, max_contour_size=0.9):
+    def set_contour_size_limits(self, min_contour_size=0.005, max_contour_size=0.6):
         global max_size
         global min_size
         global cam_height
@@ -671,6 +671,10 @@ class Classifier():
             cv2.imshow("preview", frame)
             cv2.waitKey(1)
     def classify_cam_frame(self, frame_arg):
+        global cam_height
+        global cam_width
+        cam_height, cam_width, _ = frame_arg.shape
+        self.set_contour_size_limits()
         live_dataset = self._process_frame(deepcopy(frame_arg))
         if not live_dataset == "":
             live_dataset.update()

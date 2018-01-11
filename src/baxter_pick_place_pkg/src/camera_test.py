@@ -25,9 +25,11 @@ camera_image = None
 
 def get_img(msg):
     global camera_image
-    camera_image = msg_to_cv(msg)    
-    cv2.imshow('image',camera_image)
+    camera_image = msg_to_cv(msg)
+    classifier.set_contour_size_limits()
     classifier.classify_cam_frame(camera_image)
+    print(classifier.get_contour_size_limits())
+    cv2.imshow('image', camera_image)
     print (classifier.get_contour_center())
     cv2.waitKey(1)
 

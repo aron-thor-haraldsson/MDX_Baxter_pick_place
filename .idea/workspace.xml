@@ -18,8 +18,8 @@
       <file leaf-file-name="camera_test.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/baxter_pick_place_pkg/src/camera_test.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="342">
-              <caret line="19" column="22" lean-forward="true" selection-start-line="19" selection-start-column="22" selection-end-line="19" selection-end-column="22" />
+            <state relative-caret-position="378">
+              <caret line="27" column="33" lean-forward="false" selection-start-line="27" selection-start-column="33" selection-end-line="27" selection-end-column="33" />
               <folding>
                 <element signature="e#23#39#0" expanded="true" />
               </folding>
@@ -30,8 +30,8 @@
       <file leaf-file-name="process_images.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/baxter_pick_place_pkg/src/process_images.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="530">
-              <caret line="685" column="0" lean-forward="true" selection-start-line="685" selection-start-column="0" selection-end-line="685" selection-end-column="0" />
+            <state relative-caret-position="172">
+              <caret line="671" column="22" lean-forward="false" selection-start-line="671" selection-start-column="22" selection-end-line="671" selection-end-column="22" />
               <folding>
                 <element signature="e#0#10#0" expanded="true" />
                 <element signature="e#17333#17365#0" expanded="false" />
@@ -39,16 +39,15 @@
                 <element signature="e#20195#20259#0" expanded="false" />
                 <element signature="e#20586#22009#0" expanded="false" />
                 <element signature="e#22016#22090#0" expanded="false" />
-                <element signature="e#23079#23317#0" expanded="false" />
                 <element signature="e#23411#23442#0" expanded="false" />
                 <element signature="e#25200#25314#0" expanded="false" />
                 <element signature="e#27163#27230#0" expanded="false" />
                 <element signature="e#27621#27723#0" expanded="false" />
-                <element signature="e#29238#29299#0" expanded="false" />
-                <element signature="e#31413#32290#0" expanded="false" />
-                <element signature="e#32295#32379#0" expanded="false" />
-                <element signature="e#32692#32982#0" expanded="false" />
-                <element signature="e#33152#33222#0" expanded="false" />
+                <element signature="e#29379#29440#0" expanded="false" />
+                <element signature="e#31554#32431#0" expanded="false" />
+                <element signature="e#32436#32520#0" expanded="false" />
+                <element signature="e#32833#33123#0" expanded="false" />
+                <element signature="e#33293#33363#0" expanded="false" />
               </folding>
             </state>
           </provider>
@@ -68,6 +67,9 @@
       <find>dirs</find>
       <find>\\</find>
       <find>image</find>
+      <find>set_contour_size_limits</find>
+      <find>get_contour_size_limits</find>
+      <find>cam_height</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -228,6 +230,7 @@
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.24959569" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="true" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.32924336" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32924336" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
@@ -239,7 +242,6 @@
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
     </layout>
@@ -254,7 +256,7 @@
           <url>file://$PROJECT_DIR$/src/baxter_pick_place_pkg/src/process_images.py</url>
         </line-breakpoint>
       </breakpoints>
-      <option name="time" value="1" />
+      <option name="time" value="2" />
     </breakpoint-manager>
     <watches-manager />
   </component>
@@ -315,8 +317,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/baxter_pick_place_pkg/src/camera_test.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="342">
-          <caret line="19" column="22" lean-forward="true" selection-start-line="19" selection-start-column="22" selection-end-line="19" selection-end-column="22" />
+        <state relative-caret-position="378">
+          <caret line="27" column="33" lean-forward="false" selection-start-line="27" selection-start-column="33" selection-end-line="27" selection-end-column="33" />
           <folding>
             <element signature="e#23#39#0" expanded="true" />
           </folding>
@@ -325,8 +327,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/baxter_pick_place_pkg/src/process_images.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="530">
-          <caret line="685" column="0" lean-forward="true" selection-start-line="685" selection-start-column="0" selection-end-line="685" selection-end-column="0" />
+        <state relative-caret-position="172">
+          <caret line="671" column="22" lean-forward="false" selection-start-line="671" selection-start-column="22" selection-end-line="671" selection-end-column="22" />
           <folding>
             <element signature="e#0#10#0" expanded="true" />
             <element signature="e#17333#17365#0" expanded="false" />
@@ -334,16 +336,15 @@
             <element signature="e#20195#20259#0" expanded="false" />
             <element signature="e#20586#22009#0" expanded="false" />
             <element signature="e#22016#22090#0" expanded="false" />
-            <element signature="e#23079#23317#0" expanded="false" />
             <element signature="e#23411#23442#0" expanded="false" />
             <element signature="e#25200#25314#0" expanded="false" />
             <element signature="e#27163#27230#0" expanded="false" />
             <element signature="e#27621#27723#0" expanded="false" />
-            <element signature="e#29238#29299#0" expanded="false" />
-            <element signature="e#31413#32290#0" expanded="false" />
-            <element signature="e#32295#32379#0" expanded="false" />
-            <element signature="e#32692#32982#0" expanded="false" />
-            <element signature="e#33152#33222#0" expanded="false" />
+            <element signature="e#29379#29440#0" expanded="false" />
+            <element signature="e#31554#32431#0" expanded="false" />
+            <element signature="e#32436#32520#0" expanded="false" />
+            <element signature="e#32833#33123#0" expanded="false" />
+            <element signature="e#33293#33363#0" expanded="false" />
           </folding>
         </state>
       </provider>
