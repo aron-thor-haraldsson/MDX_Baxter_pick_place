@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import cv_bridge
 import time
 import cv2
@@ -17,6 +19,7 @@ def get_img(msg):
     global camera_image
     camera_image = msg_to_cv(msg)    
     cv2.imshow('image',camera_image)
+
     cv2.waitKey(1)
 
 def msg_to_cv(msg):

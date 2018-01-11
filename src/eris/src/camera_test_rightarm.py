@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import cv_bridge
 import time
 import baxter_interface
