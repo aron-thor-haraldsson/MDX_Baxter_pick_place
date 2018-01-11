@@ -2,9 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="1b6e42b1-c42b-4767-83b1-4ae59aefec48" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change beforePath="$PROJECT_DIR$/src/baxter_pick_place_pkg/src/camera_test.py" afterPath="$PROJECT_DIR$/src/baxter_pick_place_pkg/src/camera_test.py" />
-      <change beforePath="$PROJECT_DIR$/src/baxter_pick_place_pkg/src/process_images.py" afterPath="$PROJECT_DIR$/src/baxter_pick_place_pkg/src/process_images.py" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -15,11 +13,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="camera_test.py" pinned="false" current-in-tab="false">
+      <file leaf-file-name="camera_test.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/baxter_pick_place_pkg/src/camera_test.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="378">
-              <caret line="27" column="33" lean-forward="false" selection-start-line="27" selection-start-column="33" selection-end-line="27" selection-end-column="33" />
+            <state relative-caret-position="414">
+              <caret line="29" column="47" lean-forward="false" selection-start-line="29" selection-start-column="47" selection-end-line="29" selection-end-column="47" />
               <folding>
                 <element signature="e#23#39#0" expanded="true" />
               </folding>
@@ -27,11 +25,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="process_images.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="process_images.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/baxter_pick_place_pkg/src/process_images.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="172">
-              <caret line="671" column="22" lean-forward="false" selection-start-line="671" selection-start-column="22" selection-end-line="671" selection-end-column="22" />
+            <state relative-caret-position="450">
+              <caret line="811" column="0" lean-forward="true" selection-start-line="811" selection-start-column="0" selection-end-line="811" selection-end-column="0" />
               <folding>
                 <element signature="e#0#10#0" expanded="true" />
                 <element signature="e#17333#17365#0" expanded="false" />
@@ -70,6 +68,7 @@
       <find>set_contour_size_limits</find>
       <find>get_contour_size_limits</find>
       <find>cam_height</find>
+      <find>print</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -81,8 +80,8 @@
         <option value="$PROJECT_DIR$/src/image_classification_pkg/src/process_images.py" />
         <option value="$PROJECT_DIR$/src/eris/src/camera_test_rightarm.py" />
         <option value="$PROJECT_DIR$/src/eris/src/camera_test.py" />
-        <option value="$PROJECT_DIR$/src/baxter_pick_place_pkg/src/camera_test.py" />
         <option value="$PROJECT_DIR$/src/baxter_pick_place_pkg/src/process_images.py" />
+        <option value="$PROJECT_DIR$/src/baxter_pick_place_pkg/src/camera_test.py" />
       </list>
     </option>
   </component>
@@ -315,20 +314,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/baxter_pick_place_pkg/src/camera_test.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="378">
-          <caret line="27" column="33" lean-forward="false" selection-start-line="27" selection-start-column="33" selection-end-line="27" selection-end-column="33" />
-          <folding>
-            <element signature="e#23#39#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/baxter_pick_place_pkg/src/process_images.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="172">
-          <caret line="671" column="22" lean-forward="false" selection-start-line="671" selection-start-column="22" selection-end-line="671" selection-end-column="22" />
+        <state relative-caret-position="450">
+          <caret line="811" column="0" lean-forward="true" selection-start-line="811" selection-start-column="0" selection-end-line="811" selection-end-column="0" />
           <folding>
             <element signature="e#0#10#0" expanded="true" />
             <element signature="e#17333#17365#0" expanded="false" />
@@ -345,6 +334,16 @@
             <element signature="e#32436#32520#0" expanded="false" />
             <element signature="e#32833#33123#0" expanded="false" />
             <element signature="e#33293#33363#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/baxter_pick_place_pkg/src/camera_test.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="414">
+          <caret line="29" column="47" lean-forward="false" selection-start-line="29" selection-start-column="47" selection-end-line="29" selection-end-column="47" />
+          <folding>
+            <element signature="e#23#39#0" expanded="true" />
           </folding>
         </state>
       </provider>
