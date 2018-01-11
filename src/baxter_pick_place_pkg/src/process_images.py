@@ -399,6 +399,8 @@ class Classifier():
         self._min_size = 0
         self._max_size = 0
         self._contour_center = cam_width/2 , cam_height/2
+        self._current_category = ""
+        self._current_confidence = 0
 
     def _size_check(self):
         if self.get_contour_size_limits()[1] == 0:
@@ -659,7 +661,7 @@ class Classifier():
 
             iteration += 1
             if iteration >= interval:
-                self._classify_cam_frame(frame)
+                self.classify_cam_frame(frame)
                 iteration = 0
             if key == 27:  # exit on ESC
                 end_program()
@@ -668,7 +670,7 @@ class Classifier():
 
             cv2.imshow("preview", frame)
             cv2.waitKey(1)
-    def _classify_cam_frame(self, frame_arg):
+    def classify_cam_frame(self, frame_arg):
         live_dataset = self._process_frame(deepcopy(frame_arg))
         if not live_dataset == "":
             live_dataset.update()
@@ -676,7 +678,7 @@ class Classifier():
             prediction = self.get_train().predict(X)
             percentage = self.get_train().predict_proba(X)
             for d in range(len(live_dataset.get_contour_list())):
-                self._mark_contour(frame, live_dataset.get_contour_list()[d].get_contour(), prediction[d], percentage[d])
+                self._mark_contour(frame_arg, live_dataset.get_contour_list()[d].get_contour(), prediction[d], percentage[d])
 
 
 
@@ -711,12 +713,22 @@ class Classifier():
         coor = (x, y)
         string_category = str(categories.return_abbreviation(prediction_arg))
         string_confidence = str(percentage_arg[prediction_arg] * 100)
+        self._set_current_category(string_category)
+        self._set_current_conficence(string_confidence)
         string_out = string_category + " (" + string_confidence + "%)"
         self._write_on_image(frame_arg, string_out, coor)
 
+    def _set_current_category(self, current_category_arg):
+        self._current_category = current_category_arg
+    def get_current_category(self):
+        return self._current_category
+    def _set_current_conficence(self, current_confidence_arg):
+        self._current_confidence = current_confidence_arg
+    def get_current_confidence(self):
+        return self._current_confidence
 
-    def _set_contour_center(self, rectangle):
-        x, y, w, h = rectangle
+    def _set_contour_center(self, rectangle_arg):
+        x, y, w, h = rectangle_arg
         x_center = x + w/2
         y_center = y + h/2
         self._contour_center = x_center, y_center
@@ -782,14 +794,14 @@ define_categories(range(5), ["CIR", "CRO", "SQU", "STA", "TRI"], ["Circle", "Cro
 debug_detail_level = 2
 
 # Defines an empty classifier class
-classifier = Classifier()
+#classifier = Classifier()
 # Trains the classifier using locally stored images
-classifier.set_train()
+#classifier.set_train()
 
 # Shows the parameters for the currently trained classifier
 #if debug_detail_level <= 1:
 #    print classifier.get_train()
 # Uses the trained classifier to evaluate a camera feed
-print("Starting camera feed evaluation.")
-print("Press 'esc' to end program")
+#print("Starting camera feed evaluation.")
+#print("Press 'esc' to end program")
 #classifier.cam(1)

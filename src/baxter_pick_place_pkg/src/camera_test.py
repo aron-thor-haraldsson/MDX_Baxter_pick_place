@@ -14,6 +14,10 @@ from sensor_msgs.msg import Image
 
 rospy.init_node('get_camera_image')
 
+# Defines an empty classifier class
+classifier = process_images.Classifier()
+# Trains the classifier using locally stored images
+classifier.set_train()
 left_camera = CameraController('left_hand_camera')
 left_camera.open()
 
@@ -23,7 +27,8 @@ def get_img(msg):
     global camera_image
     camera_image = msg_to_cv(msg)    
     cv2.imshow('image',camera_image)
-    
+    classifier.classify_cam_frame(camera_image)
+    print (classifier.get_contour_center())
     cv2.waitKey(1)
 
 def msg_to_cv(msg):
