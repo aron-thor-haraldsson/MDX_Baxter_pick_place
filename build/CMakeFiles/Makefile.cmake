@@ -13,10 +13,7 @@ set(CMAKE_MAKEFILE_DEPENDS
   "catkin/catkin_generated/version/package.cmake"
   "catkin_generated/installspace/_setup_util.py"
   "catkin_generated/order_packages.cmake"
-  "eris/catkin_generated/package.cmake"
   "/media/ronnamura/Data/school/GitBash/baxter_pick_place_ws/src/CMakeLists.txt"
-  "/media/ronnamura/Data/school/GitBash/baxter_pick_place_ws/src/eris/CMakeLists.txt"
-  "/media/ronnamura/Data/school/GitBash/baxter_pick_place_ws/src/eris/package.xml"
   "/opt/ros/kinetic/share/catkin/cmake/../package.xml"
   "/opt/ros/kinetic/share/catkin/cmake/all.cmake"
   "/opt/ros/kinetic/share/catkin/cmake/assert.cmake"
@@ -36,7 +33,6 @@ set(CMAKE_MAKEFILE_DEPENDS
   "/opt/ros/kinetic/share/catkin/cmake/catkin_workspace.cmake"
   "/opt/ros/kinetic/share/catkin/cmake/debug_message.cmake"
   "/opt/ros/kinetic/share/catkin/cmake/em/order_packages.cmake.em"
-  "/opt/ros/kinetic/share/catkin/cmake/em/pkg.pc.em"
   "/opt/ros/kinetic/share/catkin/cmake/em_expand.cmake"
   "/opt/ros/kinetic/share/catkin/cmake/empy.cmake"
   "/opt/ros/kinetic/share/catkin/cmake/find_program_required.cmake"
@@ -56,9 +52,6 @@ set(CMAKE_MAKEFILE_DEPENDS
   "/opt/ros/kinetic/share/catkin/cmake/templates/env.sh.in"
   "/opt/ros/kinetic/share/catkin/cmake/templates/generate_cached_setup.py.in"
   "/opt/ros/kinetic/share/catkin/cmake/templates/order_packages.context.py.in"
-  "/opt/ros/kinetic/share/catkin/cmake/templates/pkg.context.pc.in"
-  "/opt/ros/kinetic/share/catkin/cmake/templates/pkgConfig-version.cmake.in"
-  "/opt/ros/kinetic/share/catkin/cmake/templates/pkgConfig.cmake.in"
   "/opt/ros/kinetic/share/catkin/cmake/templates/rosinstall.in"
   "/opt/ros/kinetic/share/catkin/cmake/templates/setup.bash.in"
   "/opt/ros/kinetic/share/catkin/cmake/templates/setup.sh.in"
@@ -121,7 +114,6 @@ set(CMAKE_MAKEFILE_PRODUCTS
   "catkin_generated/stamps/Project/order_packages.cmake.em.stamp"
   "CMakeFiles/CMakeDirectoryInformation.cmake"
   "gtest/CMakeFiles/CMakeDirectoryInformation.cmake"
-  "eris/CMakeFiles/CMakeDirectoryInformation.cmake"
   )
 
 # Dependency information for all targets:
@@ -133,5 +125,4 @@ set(CMAKE_DEPEND_INFO_FILES
   "CMakeFiles/doxygen.dir/DependInfo.cmake"
   "gtest/CMakeFiles/gtest.dir/DependInfo.cmake"
   "gtest/CMakeFiles/gtest_main.dir/DependInfo.cmake"
-  "eris/CMakeFiles/_catkin_empty_exported_target.dir/DependInfo.cmake"
   )

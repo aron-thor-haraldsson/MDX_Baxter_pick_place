@@ -303,56 +303,6 @@ clean: gtest/CMakeFiles/gtest_main.dir/clean
 .PHONY : clean
 
 #=============================================================================
-# Directory level rules for directory eris
-
-# Convenience name for "all" pass in the directory.
-eris/all:
-
-.PHONY : eris/all
-
-# Convenience name for "clean" pass in the directory.
-eris/clean: eris/CMakeFiles/_catkin_empty_exported_target.dir/clean
-
-.PHONY : eris/clean
-
-# Convenience name for "preinstall" pass in the directory.
-eris/preinstall:
-
-.PHONY : eris/preinstall
-
-#=============================================================================
-# Target rules for target eris/CMakeFiles/_catkin_empty_exported_target.dir
-
-# All Build rule for target.
-eris/CMakeFiles/_catkin_empty_exported_target.dir/all:
-	$(MAKE) -f eris/CMakeFiles/_catkin_empty_exported_target.dir/build.make eris/CMakeFiles/_catkin_empty_exported_target.dir/depend
-	$(MAKE) -f eris/CMakeFiles/_catkin_empty_exported_target.dir/build.make eris/CMakeFiles/_catkin_empty_exported_target.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/media/ronnamura/Data/school/GitBash/baxter_pick_place_ws/build/CMakeFiles --progress-num= "Built target _catkin_empty_exported_target"
-.PHONY : eris/CMakeFiles/_catkin_empty_exported_target.dir/all
-
-# Build rule for subdir invocation for target.
-eris/CMakeFiles/_catkin_empty_exported_target.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /media/ronnamura/Data/school/GitBash/baxter_pick_place_ws/build/CMakeFiles 0
-	$(MAKE) -f CMakeFiles/Makefile2 eris/CMakeFiles/_catkin_empty_exported_target.dir/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /media/ronnamura/Data/school/GitBash/baxter_pick_place_ws/build/CMakeFiles 0
-.PHONY : eris/CMakeFiles/_catkin_empty_exported_target.dir/rule
-
-# Convenience name for target.
-_catkin_empty_exported_target: eris/CMakeFiles/_catkin_empty_exported_target.dir/rule
-
-.PHONY : _catkin_empty_exported_target
-
-# clean rule for target.
-eris/CMakeFiles/_catkin_empty_exported_target.dir/clean:
-	$(MAKE) -f eris/CMakeFiles/_catkin_empty_exported_target.dir/build.make eris/CMakeFiles/_catkin_empty_exported_target.dir/clean
-.PHONY : eris/CMakeFiles/_catkin_empty_exported_target.dir/clean
-
-# clean rule for target.
-clean: eris/CMakeFiles/_catkin_empty_exported_target.dir/clean
-
-.PHONY : clean
-
-#=============================================================================
 # Special targets to cleanup operation of make.
 
 # Special rule to run CMake to check the build system integrity.

@@ -19,11 +19,3 @@
 /media/ronnamura/Data/school/GitBash/baxter_pick_place_ws/build/gtest/CMakeFiles/gtest_main.dir
 /media/ronnamura/Data/school/GitBash/baxter_pick_place_ws/build/gtest/CMakeFiles/install/strip.dir
 /media/ronnamura/Data/school/GitBash/baxter_pick_place_ws/build/gtest/CMakeFiles/install/local.dir
-/media/ronnamura/Data/school/GitBash/baxter_pick_place_ws/build/eris/CMakeFiles/rebuild_cache.dir
-/media/ronnamura/Data/school/GitBash/baxter_pick_place_ws/build/eris/CMakeFiles/edit_cache.dir
-/media/ronnamura/Data/school/GitBash/baxter_pick_place_ws/build/eris/CMakeFiles/list_install_components.dir
-/media/ronnamura/Data/school/GitBash/baxter_pick_place_ws/build/eris/CMakeFiles/install.dir
-/media/ronnamura/Data/school/GitBash/baxter_pick_place_ws/build/eris/CMakeFiles/_catkin_empty_exported_target.dir
-/media/ronnamura/Data/school/GitBash/baxter_pick_place_ws/build/eris/CMakeFiles/install/local.dir
-/media/ronnamura/Data/school/GitBash/baxter_pick_place_ws/build/eris/CMakeFiles/install/strip.dir
-/media/ronnamura/Data/school/GitBash/baxter_pick_place_ws/build/eris/CMakeFiles/test.dir
