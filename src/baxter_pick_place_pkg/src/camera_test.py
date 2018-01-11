@@ -6,7 +6,7 @@ import cv2
 import rospy
 import os
 os.chdir(os.path.dirname(os.path.realpath(__file__)))
-import process_images.py
+import process_images
 
 
 from baxter_interface import CameraController

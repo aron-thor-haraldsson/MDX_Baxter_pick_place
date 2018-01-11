@@ -454,6 +454,7 @@ class Classifier():
             image = cv2.imread(str(dirs[i]) + str(names[i]))
             debug(5, dirs[i], names[i])
             debug(4, "func", "preview_image", "Original image", image)
+            cv2.waitKey(1)
             global cam_height
             global cam_width
             cam_height, cam_width, _ = image.shape
@@ -528,7 +529,7 @@ class Classifier():
         for directory in directories_arg:
             os.chdir(directory)
             for file in os.listdir(os.getcwd()):
-                dirs_out.append(str(os.getcwd()) + "\\")
+                dirs_out.append(str(os.getcwd()) + "/")
                 files_out.append(file)
                 figures_out.append(file[0:3])
 
@@ -557,7 +558,7 @@ class Classifier():
     # returns conts_result <int[]>: returns the contours that have passed the editing process
     # returns number_of_conts <int>: returns the number of contours found
     def _get_contours(self, image_arg):
-        conts, hierarchy = cv2.findContours(deepcopy(image_arg), cv2.RETR_LIST, cv2.CHAIN_APPROX_NONE)
+        _, conts, hierarchy = cv2.findContours(deepcopy(image_arg), cv2.RETR_LIST, cv2.CHAIN_APPROX_NONE)
         debug(4, "Number of contours before tidying: ", len(conts))
         conts = self._fix_if_contour_is_touching_edge(conts, image_arg)
         conts_result = []
@@ -614,7 +615,7 @@ class Classifier():
                     for j in range(thickness):
                         np_array[y, 0+j] = colour
                         np_array[y, x_max-j] = colour
-                conts, h = cv2.findContours(deepcopy(np_array), cv2.RETR_LIST, cv2.CHAIN_APPROX_NONE)
+                _, conts, h = cv2.findContours(deepcopy(np_array), cv2.RETR_LIST, cv2.CHAIN_APPROX_NONE)
                 debug(4, "The image border was successfully separated from any intersecting contours.",
                       "This has increased the number of contours to: ", len(conts))
         return conts
@@ -658,22 +659,27 @@ class Classifier():
 
             iteration += 1
             if iteration >= interval:
-                tmp = self._process_frame(frame)
-                if not tmp == "":
-                    live_dataset = tmp
-                    live_dataset.update()
-                    X = live_dataset.data
-                    prediction = self.get_train().predict(X)
-                    percentage = self.get_train().predict_proba(X)
-                    iteration = 0
-
-                    for d in range(len(live_dataset.get_contour_list())):
-                        self._mark_contour(frame, live_dataset.get_contour_list()[d].get_contour(), prediction[d], percentage[d])
+                self._classify_cam_frame(frame)
+                iteration = 0
             if key == 27:  # exit on ESC
                 end_program()
 
+
+
             cv2.imshow("preview", frame)
             cv2.waitKey(1)
+    def _classify_cam_frame(self, frame_arg):
+        live_dataset = self._process_frame(deepcopy(frame_arg))
+        if not live_dataset == "":
+            live_dataset.update()
+            X = live_dataset.data
+            prediction = self.get_train().predict(X)
+            percentage = self.get_train().predict_proba(X)
+            for d in range(len(live_dataset.get_contour_list())):
+                self._mark_contour(frame, live_dataset.get_contour_list()[d].get_contour(), prediction[d], percentage[d])
+
+
+
 
 
     # Processes the current video frame and turns it into contour
@@ -781,9 +787,9 @@ classifier = Classifier()
 classifier.set_train()
 
 # Shows the parameters for the currently trained classifier
-if debug_detail_level <= 1:
-    print classifier.get_train()
+#if debug_detail_level <= 1:
+#    print classifier.get_train()
 # Uses the trained classifier to evaluate a camera feed
-print "Starting camera feed evaluation."
-print "Press 'esc' to end program"
-classifier.cam(1)
+print("Starting camera feed evaluation.")
+print("Press 'esc' to end program")
+#classifier.cam(1)
