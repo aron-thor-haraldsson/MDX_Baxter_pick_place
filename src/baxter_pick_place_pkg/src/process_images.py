@@ -6,6 +6,7 @@ from time import sleep
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.model_selection import train_test_split
 import sys
+import pickle
 
 
 cam_width = 0
@@ -405,11 +406,16 @@ class Classifier():
     def _size_check(self):
         if self.get_contour_size_limits()[1] == 0:
             self.set_contour_size_limits()
-    def set_train(self, directories_arg=""):
-        self._size_check()
-        if directories_arg == "":
-            directories_arg = ["./teach_images/focus_good", "./teach_images/focus_bad"]
-        self._k_nearest_neighbour = self._train_classifier(directories_arg)
+    def set_train(self, new_arg=False, directories_arg=""):
+        filename = 'knn_model.sav'
+        if new_arg:
+            self._size_check()
+            if directories_arg == "":
+                directories_arg = ["./teach_images/focus_good", "./teach_images/focus_bad"]
+            self._k_nearest_neighbour = self._train_classifier(directories_arg)
+            pickle.dump(self.get_train(), open(filename, 'wb'))
+        else:
+            self._k_nearest_neighbour = pickle.load(open(filename, 'rb'))
 
 
     def get_train(self):
@@ -798,9 +804,9 @@ define_categories(range(5), ["CIR", "CRO", "SQU", "STA", "TRI"], ["Circle", "Cro
 debug_detail_level = 2
 
 # Defines an empty classifier class
-#classifier = Classifier()
+classifier = Classifier()
 # Trains the classifier using locally stored images
-#classifier.set_train()
+classifier.set_train(True)
 
 # Shows the parameters for the currently trained classifier
 #if debug_detail_level <= 1:
