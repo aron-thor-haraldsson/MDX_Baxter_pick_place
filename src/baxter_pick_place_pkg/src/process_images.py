@@ -121,9 +121,226 @@ class Categories():
         debug(1, "Did not recognise -", input_arg, "- as a valid value for category conversion.")
         end_program()
 
+class Image():
+    def __init__(self):
+        self._image = []
+        self._classifier = False
+        self._for_training = False
+        self._binarised_image = []
+        self._annotated_image = []
+        self._image_size = 0
+        self._image_height = 0
+        self._image_width = 0
+        self._contours = []
+        self._classes = []
+        self._confidences = 0
+
+    def set_image(self, image_arg):
+        if len(image_arg) > 0:
+            self._image = image_arg
+        if len(self._image) == 0:
+            debug(1, "Error in set_image: ", "Image has 0 size")
+    def get_image(self):
+        return self._image
+    def set_for_training(self, for_training_arg):
+        self._for_training = for_training_arg
+    def get_for_training(self):
+        return self._for_training
+    def process_image(self):
+        self.set_dimensions()
+        self.set_binarised_image()
+        self.set_contours()
+        if self._for_training == False and self.get_classifier():
+            classify_contours()
+    def set_classifier(self, classifier_arg):
+        self._classifier = classifier_arg
+    def get_classifier(self):
+        return self._classifier
+
+
+    def set_dimensions(self):
+        self._image_height, self._image_width, _ = self.get_image().shape
+        self._image_size = self.get_height()*self.get_width()
+        self.set_contour_size_limits()
+    def get_height(self):
+        return self._image_height
+    def get_width(self):
+        return self._image_width
+    def get_size(self):
+        return self._image_size
+
+    # Pre-processes the image with certain tools in a specific order
+    # receives image_arg <image>: the relative paths that you want to include in the search
+    # returns funcionts_arg <str[]>: returns the directory of every file found
+    # returns kernel_arg <int[][]>: returns the name of every file found
+    def set_binarised_image(self, functions_arg=[], kernel_arg=""):
+        if not functions_arg:
+            functions_arg = ["gray", "increase_contrast", "open", "close"]
+        if not kernel_arg:
+            kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (7, 7))
+        im = deepcopy(self.get_image())
+        im_tmp = deepcopy(self.get_image())
+        for f in functions_arg:
+            if f == 'gray':
+                im_tmp = cv2.cvtColor(deepcopy(im), cv2.COLOR_BGR2GRAY)
+            if f == 'dilate':
+                im_tmp = cv2.morphologyEx(deepcopy(im), cv2.MORPH_DILATE, kernel)
+            elif f == 'erode':
+                im_tmp = cv2.morphologyEx(deepcopy(im), cv2.MORPH_ERODE, kernel)
+            elif f == 'open':
+                im_tmp = cv2.morphologyEx(deepcopy(im), cv2.MORPH_OPEN, kernel)
+            elif f == 'close':
+                im_tmp = cv2.morphologyEx(deepcopy(im), cv2.MORPH_CLOSE, kernel)
+            elif f == 'mean_shift':
+                im_tmp = cv2.pyrMeanShiftFiltering(deepcopy(im), 31, 51)
+            elif f == 'increase_contrast':
+                im_tmp = cv2.convertScaleAbs(deepcopy(im), -1, 2, 0)
+            elif f == 'decrease_contrast':
+                im_tmp = cv2.convertScaleAbs(deepcopy(im), -1, 0.5, 0)
+            else:
+                pass
+            im = deepcopy(im_tmp)
+            debug(4, "func", "preview_image", str(f), im)
+        th, im_thresh = cv2.threshold(im, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+        self._binarised_image = im_thresh
+    def get_binarised_image(self):
+        return self._binarised_image
+    def set_annotated_image(self, image_arg):
+        self._annotated_image = deepcopy(image_arg)
+    def get_annotated_image(self):
+        return self._annotated_image
+
+    # Sets the contour size limits in percentage of image size
+    def set_contour_size_limits(self, min_size_arg=0.005, max_size_arg=0.6):
+        self._min_size = self.get_size() * min_size_arg
+        self._max_size = self.get_size() * max_size_arg
+    def get_contour_size_limits(self):
+        return self._min_size, self._max_size
+
+
+    # Gets the contours of an image
+    # receives image_arg <image>: the image you want to extract contours from
+    # receives min_size_arg <int>: used to determine the minimum size of a contour for it to be included (optional)
+    # receives max_size_arg <int>: used to determine the maximum size of a contour for it to be included (optional)
+    # returns conts_result <int[]>: returns the contours that have passed the editing process
+    # returns number_of_conts <int>: returns the number of contours found
+    def set_contours(self):
+        conts, hierarchy = cv2.findContours(deepcopy(self.get_binarised_image()), cv2.RETR_LIST, cv2.CHAIN_APPROX_NONE)
+        debug(4, "Number of contours before tidying: ", len(conts))
+        conts = self._fix_if_contour_is_touching_edge(conts)
+        conts_result = []
+        sleep(0.01)
+        if conts:
+            for cont in conts:
+                area = cv2.contourArea(cont)
+                if area > self.get_contour_size_limits()[0]:
+                    if area < self.get_contour_size_limits()[1]:
+                        conts_result.append(cont)
+                    else:
+                        debug(5, "Contour removed because it was too big.")
+                else:
+                    debug(5, "Contour removed because it was too small.")
+        debug(3, "Number of contours after tidying: ", len(conts_result))
+        number_of_conts = len(conts_result)
+        if len(conts_result) > 1:
+            debug(3, "Multiple contours found.")
+            debug(3, "func", "preview_image", "Multiple contours", self.get_image())
+        if len(conts_result) < 1:
+            debug(3, "No contours found.")
+            debug(3, "func", "preview_image", "No contours", self.get_image())
+        self._contours = conts_result
+    def get_contours(self):
+        return self._contours
+    # In case there is a significant contour touching the border of the image, the two are separated with white pixels
+    # receives contours_arg <int[]>: the contour list of an image
+    # receives image_arg <image>: a thresholded image
+    # returns conts <int[]>: in case a problem was found, this returns the new contour list
+    def _fix_if_contour_is_touching_edge(self, contours_arg):
+        border_area = (cam_height - 3) * (cam_width - 3)
+        border_length = 2 * (cam_height - 3) + 2 * (cam_width - 3)
+        np_array = deepcopy(self.get_binarised_image())
+        conts = contours_arg
+        last_cont = conts[len(conts)-1]
+        rect = cv2.boundingRect(last_cont)
+        area = cv2.contourArea(last_cont)
+        length = cv2.arcLength(last_cont, True)
+        extreme_corner_count = int(rect[0] <= 2) + int(rect[1] <= 2) + int(rect[2] >= (cam_width - 3))\
+                               + int(rect[3] >= (cam_height - 3))
+        if extreme_corner_count >= 3:
+            if area < border_area - 1000 and length > border_length + 20:
+                x_min = 0
+                x_max = len(np_array[0]) - 1
+                y_min = 0
+                y_max = len(np_array) - 1
+                thickness = 5
+                colour = 255
+                for x in range(x_min, x_max+1):
+                    for i in range(thickness):
+                        np_array[0+i, x] = colour
+                        np_array[y_max-i, x] = colour
+                for y in range(y_min, y_max+1):
+                    for j in range(thickness):
+                        np_array[y, 0+j] = colour
+                        np_array[y, x_max-j] = colour
+                conts, h = cv2.findContours(deepcopy(np_array), cv2.RETR_LIST, cv2.CHAIN_APPROX_NONE)
+                debug(4, "The image border was successfully separated from any intersecting contours.",
+                      "This has increased the number of contours to: ", len(conts))
+        return conts
+    def classify_contours(self, classifier_arg=False):
+        if classifier_arg:
+            self.set_classifier(classifier_arg)
+        conts = []
+        for cont in self.get_contours():
+            print "-"
+            print self.get_classifier()
+            print "-"
+            sleep(1)
+            cont.classify_contour(self.get_classifier())
+            conts.append(cont)
+        self._contours = conts
+    def mark_contours():
+        global categories
+        for cont in self.get_contours():
+            x, y, w, h = cont.get_bounding_rect()
+            cv2.rectangle(self.get_annotated_image(), (x, y), (x + w, y + h), (0, 255, 0), 2)
+            coor = (x, y)
+            string_category = str(categories.return_abbreviation(prediction_arg))
+            string_confidence = str(percentage_arg[prediction_arg] * 100)
+            self._set_current_category(string_category)
+            self._set_current_conficence(string_confidence)
+            string_out = string_category + " (" + string_confidence + "%)"
+            self.write_on_image(self.get_annotated_image(), string_out, coor)
+    def write_on_image(frame_arg=[], text_arg="", coordinate_arg="", colour_arg=[]):
+        if len(frame_arg) < 1:
+            debug(1, "No frame detected during write_on_image function call.")
+            end_program()
+        if text_arg == "":
+            text_arg = "No text supplied"
+        if len(coordinate_arg) < 1:
+            text_arg = "No coordinates supplied"
+            coordinate_arg = (10, 50)
+        else:
+            x_tmp, y_tmp = coordinate_arg
+            y_tmp = y_tmp - 20
+            if y_tmp < 50:
+                y_tmp = 50
+            coordinate_arg = x_tmp, y_tmp
+        if len(colour_arg) < 1:
+            debug(4, "No text colour supplied, reverting to default colour")
+            colour_arg = (255, 0, 0)
+
+        font = cv2.FONT_HERSHEY_SIMPLEX
+        lower_left_corner = coordinate_arg
+        fontScale = 1
+        line_type = 2
+
+        cv2.putText(self.get_annotated_image(), text_arg, lower_left_corner, font, fontScale, colour_arg, line_type)
+
+
+
 # Stores a contour and all relevant information about it
 class Contour:
-    def __init__(self, contour_arg=[]):
+    def __init__(self, contour_arg=False):
         self._contour = contour_arg
         self._shape_type = ""
         self._directory = ""
@@ -148,8 +365,22 @@ class Contour:
         self._extent = ""
         self._solidity = ""
 
-    def set_contour(self, contour_arg):
-        self._contour = contour_arg
+        self._bounding_rect = []
+        self._confidence = 0
+        self._category = []
+        self._contour_center = []
+
+        self._dataset = False
+        self._prediction = False
+        self._confidence = False
+
+
+    def set_contour(self, contour_arg=False):
+        if contour_arg:
+            self._contour = contour_arg
+        if self._contour == False:
+            debug(2, "Contour error: ", "No contour_arg during set_contour")
+        self.set_features()
     def get_contour(self):
         return self._contour
     def set_frame_number(self, frame_number_arg):
@@ -229,6 +460,8 @@ class Contour:
         self._hull_area = cv2.contourArea(cv2.convexHull(self.get_contour()))
         self._extent = self.get_contourArea() / self.get_minAreaRectArea()
         self._solidity = self.get_contourArea() / self.get_hull_area()
+        self.set_bounding_rect()
+        self._set_contour_center()
         debug(3, "filename: ", self.get_filename())
         debug(4, "arclength: ", self.get_arcLength())
         debug(4, "contourArea: ", self.get_contourArea())
@@ -272,6 +505,35 @@ class Contour:
         return self._extent
     def get_solidity(self):
         return self._solidity
+
+    def set_bounding_rect(self):
+        self._bounding_rect = cv2.boundingRect(self.get_contour())
+    def get_bounding_rect(self):
+        return self._bounding_rect
+    def _set_contour_center(self):
+        x, y, w, h = self.get_bounding_rect()
+        x_center = x + w/2
+        y_center = y + h/2
+        self._contour_center = x_center, y_center
+    def get_contour_center(self):
+        return self._contour_center
+
+
+    def set_dataset(self):
+        d_set = Dataset()
+        d_set.add_contour(self.get_contour())
+        d_set.update()
+        self._dataset = d_set
+        if not self._classifier == False:
+            self.classify_contour(self.get_classifier())
+    def get_dataset(self):
+        return self._dataset
+    def classify_contour(classifier_arg):
+
+        X = self.get_dataset().data
+        self._prediction = classifier_arg.get_train().predict(X)
+        self._percentage = classifier_arg.get_train().predict_proba(X)
+
 
 # Keeps and handles multiple contours
 class Dataset:
@@ -318,9 +580,21 @@ class Dataset:
     def set_target(self):
         target_matrix = []
         global categories
+        print len(self.get_contour_list())
         for t in range(len(self.get_contour_list())):
             curr_cont = self.get_contour_list()[t]
-            target_line = curr_cont.get_features()[self._shape_type_index]
+            print curr_cont.get_contour()[t]
+            print t
+            try:
+                curr_cont.set_features()
+                target_line = curr_cont.get_features()[self._shape_type_index]
+            except:
+                print "-"
+                print curr_cont.get_features()
+                print "-"
+                print self._shape_type_index
+                print "-"
+                sleep (1)
             target_matrix.append(categories.return_index(target_line))
         self.target = np.array(target_matrix)
     def set_data(self):
@@ -396,17 +670,8 @@ def preview_image(title_arg, image_arg):
 class Classifier():
     def __init__(self):
         self._k_nearest_neighbour = []
-        self._min_size = 0
-        self._max_size = 0
-        self._contour_center = cam_width/2 , cam_height/2
-        self._current_category = ""
-        self._current_confidence = 0
 
-    def _size_check(self):
-        if self.get_contour_size_limits()[1] == 0:
-            self.set_contour_size_limits()
     def set_train(self, directories_arg=""):
-        self._size_check()
         if directories_arg == "":
             directories_arg = ["./teach_images/focus_good", "./teach_images/focus_bad"]
         self._k_nearest_neighbour = self._train_classifier(directories_arg)
@@ -452,70 +717,33 @@ class Classifier():
 
         teach_dataset = Dataset("train")
         # for i in range (len(dirs)):
-        for i in range(1000):
-            image = cv2.imread(str(dirs[i]) + str(names[i]))
+        for i in range(500):
+            img = Image()
+            img.set_image(cv2.imread(str(dirs[i]) + str(names[i])))
             debug(5, dirs[i], names[i])
-            debug(4, "func", "preview_image", "Original image", image)
-            cv2.waitKey(1)
+            debug(4, "func", "preview_image", "Original image", img.get_image())
             global cam_height
             global cam_width
-            cam_height, cam_width, _ = image.shape
-            self._size_check()
-            image_processed = self._process_image(image)
-            debug(4, "func", "preview_image", "Processed image", image_processed)
-            cont, number = self._get_contours(image_processed)
+            cam_height, cam_width, _ = 480, 640, 0
+            img.set_for_training(True)
+            img.process_image()
+            debug(4, "func", "preview_image", "Binarised image", img.get_binarised_image())
+            conts = img.get_contours()
 
             nr_of_images_total += 1
-            if len(cont) == 1:
-                new_contour = Contour(cont[0])
+            if len(conts) == 1:
+                new_contour = Contour(conts[0])
                 new_contour.set_directory(dirs[i])
                 new_contour.set_filename(names[i])
                 new_contour.set_shape_type(shapes[i])
-                new_contour.set_features()
                 teach_dataset.add_contour(new_contour)
                 nr_of_images_kept += 1
             else:
                 debug(3, dirs[i], names[i], " failed to produce a contour and was discarded.")
-            debug(4, "func", "preview_image", "Image with contours", image)
+            debug(4, "func", "preview_image", "Image with contours", img.get_image())
 
         debug(2, "For training purposes, ", nr_of_images_kept, " images kept out of ", nr_of_images_total)
         return teach_dataset
-
-
-    # Pre-processes the image with certain tools in a specific order
-    # receives image_arg <image>: the relative paths that you want to include in the search
-    # returns funcionts_arg <str[]>: returns the directory of every file found
-    # returns kernel_arg <int[][]>: returns the name of every file found
-    def _process_image(self, image_arg, functions_arg=[], kernel_arg=""):
-        if not functions_arg:
-            functions_arg = ["gray", "increase_contrast", "open", "close"]
-        if not kernel_arg:
-            kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (7, 7))
-        im = deepcopy(image_arg)
-        im_tmp = deepcopy(image_arg)
-        for f in functions_arg:
-            if f == 'gray':
-                im_tmp = cv2.cvtColor(deepcopy(im), cv2.COLOR_BGR2GRAY)
-            if f == 'dilate':
-                im_tmp = cv2.morphologyEx(deepcopy(im), cv2.MORPH_DILATE, kernel)
-            elif f == 'erode':
-                im_tmp = cv2.morphologyEx(deepcopy(im), cv2.MORPH_ERODE, kernel)
-            elif f == 'open':
-                im_tmp = cv2.morphologyEx(deepcopy(im), cv2.MORPH_OPEN, kernel)
-            elif f == 'close':
-                im_tmp = cv2.morphologyEx(deepcopy(im), cv2.MORPH_CLOSE, kernel)
-            elif f == 'mean_shift':
-                im_tmp = cv2.pyrMeanShiftFiltering(deepcopy(im), 31, 51)
-            elif f == 'increase_contrast':
-                im_tmp = cv2.convertScaleAbs(deepcopy(im), -1, 2, 0)
-            elif f == 'decrease_contrast':
-                im_tmp = cv2.convertScaleAbs(deepcopy(im), -1, 0.5, 0)
-            else:
-                pass
-            im = deepcopy(im_tmp)
-            debug(4, "func", "preview_image", str(f), im)
-        th, im_thresh = cv2.threshold(im, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
-        return im_thresh
 
 
     # Generates a list of paths of image files that can be used for processing
@@ -538,189 +766,25 @@ class Classifier():
             os.chdir(starting_dir)
         return dirs_out, files_out, figures_out
 
-    # Sets the contour size limits in percentage of image size
-    def set_contour_size_limits(self, min_contour_size=0.005, max_contour_size=0.6):
-        global max_size
-        global min_size
-        global cam_height
-        global cam_width
-        cam_size = cam_height * cam_width
-        self._min_size = cam_size * min_contour_size
-        self._max_size = cam_size * max_contour_size
-
-
-    def get_contour_size_limits(self):
-        return self._min_size, self._max_size
-
-
-    # Gets the contours of an image
-    # receives image_arg <image>: the image you want to extract contours from
-    # receives min_size_arg <int>: used to determine the minimum size of a contour for it to be included (optional)
-    # receives max_size_arg <int>: used to determine the maximum size of a contour for it to be included (optional)
-    # returns conts_result <int[]>: returns the contours that have passed the editing process
-    # returns number_of_conts <int>: returns the number of contours found
-    def _get_contours(self, image_arg):
-        _, conts, hierarchy = cv2.findContours(deepcopy(image_arg), cv2.RETR_LIST, cv2.CHAIN_APPROX_NONE)
-        debug(4, "Number of contours before tidying: ", len(conts))
-        conts = self._fix_if_contour_is_touching_edge(conts, image_arg)
-        conts_result = []
-        sleep(0.01)
-        if conts:
-            for cont in conts:
-                area = cv2.contourArea(cont)
-                if area > self.get_contour_size_limits()[0]:
-                    if area < self.get_contour_size_limits()[1]:
-                        conts_result.append(cont)
-                    else:
-                        debug(5, "Contour removed because it was too big.")
-                else:
-                    debug(5, "Contour removed because it was too small.")
-        debug(3, "Number of contours after tidying: ", len(conts_result))
-        number_of_conts = len(conts_result)
-        if len(conts_result) > 1:
-            debug(3, "Multiple contours found.")
-            debug(3, "func", "preview_image", "Multiple contours", image_arg)
-        if len(conts_result) < 1:
-            debug(3, "No contours found.")
-            debug(3, "func", "preview_image", "No contours", image_arg)
-        return conts_result, number_of_conts
-
-
-    # In case there is a significant contour touching the border of the image, the two are separated with white pixels
-    # receives contours_arg <int[]>: the contour list of an image
-    # receives image_arg <image>: a thresholded image
-    # returns conts <int[]>: in case a problem was found, this returns the new contour list
-    def _fix_if_contour_is_touching_edge(self, contours_arg, image_arg):
-        border_area = (cam_height - 3) * (cam_width - 3)
-        border_length = 2 * (cam_height - 3) + 2 * (cam_width - 3)
-        np_array = deepcopy(image_arg)
-        conts = contours_arg
-        last_cont = conts[len(conts)-1]
-        rect = cv2.boundingRect(last_cont)
-        area = cv2.contourArea(last_cont)
-        length = cv2.arcLength(last_cont, True)
-        extreme_corner_count = int(rect[0] <= 2) + int(rect[1] <= 2) + int(rect[2] >= (cam_width - 3))\
-                               + int(rect[3] >= (cam_height - 3))
-        if extreme_corner_count >= 3:
-            if area < border_area - 1000 and length > border_length + 20:
-                x_min = 0
-                x_max = len(np_array[0]) - 1
-                y_min = 0
-                y_max = len(np_array) - 1
-                thickness = 5
-                colour = 255
-                for x in range(x_min, x_max+1):
-                    for i in range(thickness):
-                        np_array[0+i, x] = colour
-                        np_array[y_max-i, x] = colour
-                for y in range(y_min, y_max+1):
-                    for j in range(thickness):
-                        np_array[y, 0+j] = colour
-                        np_array[y, x_max-j] = colour
-                _, conts, h = cv2.findContours(deepcopy(np_array), cv2.RETR_LIST, cv2.CHAIN_APPROX_NONE)
-                debug(4, "The image border was successfully separated from any intersecting contours.",
-                      "This has increased the number of contours to: ", len(conts))
-        return conts
-
-
-    # Commences grabbing of webcam feed followed by feed classification
-    # receives webcam_index_arg <int>: the index of the camera to use (optional)
-    # returns: N/A
-    def cam(self, webcam_index_arg=0):
-        self._size_check()
-        if not self.get_train():
-            debug(1, "Error, no algorithm supplied to classifier function. Unable to classify camera feed.")
-            end_program()
-        self._classify_cam_feed(webcam_index_arg)
-
-
-    # Captures video frames and sends it to processing, followed by contour estimation and contour marking
-    # receives webcam_index_arg <int>: the index of the camera to use
-    # returns: N/A
-    def _classify_cam_feed(self, webcam_index_arg):
-
-        rval = False
-        cv2.namedWindow("preview")
-        global vc
-        vc = cv2.VideoCapture(webcam_index_arg)
-        if vc.isOpened():  # try to get the first frame
-            rval, frame = vc.read()
-        else:
-            rval = False
-
-        global cam_height
-        global cam_width
-        cam_height, cam_width, _ = frame.shape
-        self.set_contour_size_limits()
-
-        interval = 1
-        iteration = 0
-        while rval:
-            rval, frame = vc.read()  # read the image again at each loop
-            key = cv2.waitKey(20)
-
-            iteration += 1
-            if iteration >= interval:
-                self.classify_cam_frame(frame)
-                iteration = 0
-            if key == 27:  # exit on ESC
-                end_program()
-
-
-
-            cv2.imshow("preview", frame)
-            cv2.waitKey(1)
-    def classify_cam_frame(self, frame_arg):
-        global cam_height
-        global cam_width
-        cam_height, cam_width, _ = frame_arg.shape
-        self.set_contour_size_limits()
-        live_dataset = self._process_frame(deepcopy(frame_arg))
-        if not live_dataset == "":
-            live_dataset.update()
-            X = live_dataset.data
-            prediction = self.get_train().predict(X)
-            percentage = self.get_train().predict_proba(X)
-            for d in range(len(live_dataset.get_contour_list())):
-                self._mark_contour(frame_arg, live_dataset.get_contour_list()[d].get_contour(), prediction[d], percentage[d])
-
-
-
-
 
     # Processes the current video frame and turns it into contour
     # recieves frame_arg <int[]>: a raw frame to be processed
     # returns current_dataset <Dataset>: an objects that holds and handles multiple contours
-    def _process_frame(self, frame_arg):
+    # def _process_frame(self, frame_arg):
 
 
-        frame_processed = self._process_image(frame_arg)
-        #preview_image("aefv", frame_processed)
-        conts, number = self._get_contours(frame_processed)
-        current_dataset = Dataset("estimate")
-        if number == 0:
-            return ""
-        for i in range(len(conts)):
-            new_contour = Contour(conts[i])
-            new_contour.set_features()
-            current_dataset.add_contour(new_contour)
-        return current_dataset
+    #     frame_processed = self._process_image(frame_arg)
+    #     #preview_image("aefv", frame_processed)
+    #     conts, number = self._get_contours(frame_processed)
+    #     current_dataset = Dataset("estimate")
+    #     if number == 0:
+    #         return ""
+    #     for i in range(len(conts)):
+    #         new_contour = Contour(conts[i])
+    #         new_contour.set_features()
+    #         current_dataset.add_contour(new_contour)
+    #     return current_dataset
 
-
-    def _mark_contour(self, frame_arg, contour_arg, prediction_arg, percentage_arg):
-        global categories
-
-        rect = cv2.boundingRect(contour_arg)
-        self._set_contour_center(rect)
-        x, y, w, h = rect
-        cv2.rectangle(frame_arg, (x, y), (x + w, y + h), (0, 255, 0), 2)
-        coor = (x, y)
-        string_category = str(categories.return_abbreviation(prediction_arg))
-        string_confidence = str(percentage_arg[prediction_arg] * 100)
-        self._set_current_category(string_category)
-        self._set_current_conficence(string_confidence)
-        string_out = string_category + " (" + string_confidence + "%)"
-        self._write_on_image(frame_arg, string_out, coor)
 
     def _set_current_category(self, current_category_arg):
         self._current_category = current_category_arg
@@ -731,44 +795,44 @@ class Classifier():
     def get_current_confidence(self):
         return self._current_confidence
 
-    def _set_contour_center(self, rectangle_arg):
-        x, y, w, h = rectangle_arg
-        x_center = x + w/2
-        y_center = y + h/2
-        self._contour_center = x_center, y_center
+
+# Captures video frames and sends it to processing, followed by contour estimation and contour marking
+# receives webcam_index_arg <int>: the index of the camera to use
+# returns: N/A
+def classify_cam_feed(webcam_index_arg, classifier_arg):
+
+    rval = False
+    cv2.namedWindow("preview")
+    global vc
+    vc = cv2.VideoCapture(webcam_index_arg)
+    if vc.isOpened():  # try to get the first frame
+        rval, frame = vc.read()
+    else:
+        rval = False
+
+    interval = 1
+    iteration = 0
+    while rval:
+        rval, frame = vc.read()  # read the image again at each loop
+        key = cv2.waitKey(20)
+
+        iteration += 1
+        if iteration >= interval:
+            img = Image()
+            img.set_image(frame)
+            img.set_for_training(False)
+            img.process_image()
+            img.classify_contours(classifier_arg)
 
 
-    def get_contour_center(self):
-        return self._contour_center
 
-
-    def _write_on_image(self, frame_arg=[], text_arg="", coordinate_arg="", colour_arg=[]):
-        if len(frame_arg) < 1:
-            debug(1, "No frame detected during write_on_image function call.")
+            iteration = 0
+        if key == 27:  # exit on ESC
             end_program()
-        if text_arg == "":
-            text_arg = "No text supplied"
-        if len(coordinate_arg) < 1:
-            text_arg = "No coordinates supplied"
-            coordinate_arg = (10, 50)
-        else:
-            x_tmp, y_tmp = coordinate_arg
-            y_tmp = y_tmp - 20
-            if y_tmp < 50:
-                y_tmp = 50
-            coordinate_arg = x_tmp, y_tmp
-        if len(colour_arg) < 1:
-            debug(4, "No text colour supplied, reverting to default colour")
-            colour_arg = (255, 0, 0)
 
-        font = cv2.FONT_HERSHEY_SIMPLEX
-        lower_left_corner = coordinate_arg
-        fontScale = 1
-        line_type = 2
-
-        cv2.putText(frame_arg, text_arg, lower_left_corner, font, fontScale, colour_arg, line_type)
-
-
+        cv2.imshow("preview", frame)
+        cv2.waitKey(1)
+#def classify_image(image_arg):
 
 
 # Creates and populates a class that takes care of all conversions of category types
@@ -798,14 +862,15 @@ define_categories(range(5), ["CIR", "CRO", "SQU", "STA", "TRI"], ["Circle", "Cro
 debug_detail_level = 2
 
 # Defines an empty classifier class
-#classifier = Classifier()
+classifier = Classifier()
 # Trains the classifier using locally stored images
-#classifier.set_train()
+classifier.set_train()
 
 # Shows the parameters for the currently trained classifier
-#if debug_detail_level <= 1:
-#    print classifier.get_train()
+if debug_detail_level <= 1:
+    print classifier.get_train()
 # Uses the trained classifier to evaluate a camera feed
-#print("Starting camera feed evaluation.")
-#print("Press 'esc' to end program")
+print("Starting camera feed evaluation.")
+print("Press 'esc' to end program")
 #classifier.cam(1)
+classify_cam_feed(classifier)
