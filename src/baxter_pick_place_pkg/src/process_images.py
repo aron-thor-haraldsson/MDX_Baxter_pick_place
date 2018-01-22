@@ -148,6 +148,8 @@ class Contour:
         self._hull_area = ""
         self._extent = ""
         self._solidity = ""
+        self._lengths = ""
+        self._keypoint_quantity = ""
 
     def set_contour(self, contour_arg):
         self._contour = contour_arg
@@ -189,7 +191,7 @@ class Contour:
         self._contour = contour_arg
     def set_feature_labels(self, feature_labels_arg=[]):
         if len(feature_labels_arg) < 1:
-            self._feature_labels = ["shape_type", "flimsiness", "rect_aspect_ratio", "extent", "solidity"]
+            self._feature_labels = ["shape_type", "flimsiness", "rect_aspect_ratio", "extent", "solidity", "lengths"]
         else:
             self._feature_labels = feature_labels_arg
     def get_feature_labels(self):
@@ -211,6 +213,10 @@ class Contour:
                 feature_data.append(self.get_extent())
             elif features_labels[i] == "solidity":
                 feature_data.append(self.get_solidity())
+            elif features_labels[i] == "lengths":
+                feature_data.append(self.get_lengths())
+
+
         self._feature_data = feature_data
     def get_features(self):
         return self._feature_data
@@ -226,10 +232,11 @@ class Contour:
         self._rect_aspect_ratio = self.get_minAreaRect_width() / self.get_minAreaRect_height()
         self._minEnclosingCircle = cv2.minEnclosingCircle(self.get_contour())
         self._hull = cv2.convexHull(self.get_contour(), returnPoints=False)
-        self._defects = cv2.convexityDefects(self.get_contour(), self.get_hull())
+        #self._defects = cv2.convexityDefects(self.get_contour(), self.get_hull())
         self._hull_area = cv2.contourArea(cv2.convexHull(self.get_contour()))
         self._extent = self.get_contourArea() / self.get_minAreaRectArea()
         self._solidity = self.get_contourArea() / self.get_hull_area()
+        self._lengths = len(self._contour) / 100
         debug(3, "filename: ", self.get_filename())
         debug(4, "arclength: ", self.get_arcLength())
         debug(4, "contourArea: ", self.get_contourArea())
@@ -273,6 +280,8 @@ class Contour:
         return self._extent
     def get_solidity(self):
         return self._solidity
+    def get_lengths(self):
+        return self._lengths
 
 # Keeps and handles multiple contours
 class Dataset:
@@ -399,7 +408,7 @@ class Classifier():
         self._k_nearest_neighbour = []
         self._min_size = 0
         self._max_size = 0
-        self._contour_center = cam_height/2, cam_width/2
+        self._contour_center = 0
         self._current_category = ""
         self._current_confidence = 0
 
@@ -411,13 +420,15 @@ class Classifier():
     def set_train(self, new_arg=False, directories_arg=""):
         filename = 'knn_model.sav'
         if new_arg:
-            self._size_check()
+            #self._size_check()
             if directories_arg == "":
                 directories_arg = ["./teach_images/focus_good", "./teach_images/focus_bad"]
             self._k_nearest_neighbour = self._train_classifier(directories_arg)
             pickle.dump(self.get_train(), open(filename, 'wb'))
+            debug(2, "Machine learning model successfully saved to file")
         else:
             self._k_nearest_neighbour = pickle.load(open(filename, 'rb'))
+            debug(2, "Machine learning model successfullyl loaded from file")
 
 
     def get_train(self):
@@ -459,8 +470,8 @@ class Classifier():
 
 
         teach_dataset = Dataset("train")
-        # for i in range (len(dirs)):
-        for i in range(2000):
+        for i in range (len(dirs)):
+        #for i in range(1000):
             image = cv2.imread(str(dirs[i]) + str(names[i]))
             debug(5, dirs[i], names[i])
             debug(4, "func", "preview_image", "Original image", image)
@@ -469,6 +480,7 @@ class Classifier():
             global cam_width
             cam_height, cam_width, _ = image.shape
             self._size_check()
+            self.set_contour_size_limits()
             image_processed = self._process_image(image)
             debug(4, "func", "preview_image", "Processed image", image_processed)
             cont, number = self._get_contours(image_processed)
@@ -496,7 +508,7 @@ class Classifier():
     # returns kernel_arg <int[][]>: returns the name of every file found
     def _process_image(self, image_arg, functions_arg=[], kernel_arg=""):
         if not functions_arg:
-            functions_arg = ["gray", "increase_contrast", "close", "open", "increase_contrast"]
+            functions_arg = ["gray", "increase_contrast", "open", "close"]
         if not kernel_arg:
             kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (7, 7))
         im = deepcopy(image_arg)
@@ -585,6 +597,8 @@ class Classifier():
         sleep(0.01)
         if conts:
             for cont in conts:
+                cont_len = cv2.arcLength(cont, True)
+                cont = cv2.approxPolyDP(cont, 0.005*cont_len, True)
                 area = cv2.contourArea(cont)
                 if area > self.get_contour_size_limits()[0]:
                     if area < self.get_contour_size_limits()[1]:
@@ -737,6 +751,7 @@ class Classifier():
         self._set_contour_center(rect)
         x, y, w, h = rect
         cv2.rectangle(frame_arg, (x, y), (x + w, y + h), (0, 255, 0), 2)
+        cv2.drawContours(frame_arg, [contour_arg], 0, (0,255,0), 3)
         coor = (x, y)
         string_category = str(categories.return_abbreviation(prediction_arg))
         string_confidence = str(percentage_arg[prediction_arg] * 100)
@@ -831,7 +846,7 @@ debug_detail_level = 2
 #classifier = Classifier()
 # Trains the classifier using locally stored images
 # Pass in false to use prelearned model or true to relearn model
-#classifier.set_train(False)
+#classifier.set_train(True)
 
 # Shows the parameters for the currently trained classifier
 #if debug_detail_level <= 1:
