@@ -33,7 +33,7 @@ def get_img(msg):
     classifier.set_contour_size_limits(0.01, 0.3, cam_height, cam_width)
     classifier.classify_cam_frame(camera_image)
     cv2.imshow('image', camera_image)
-    for cont_info in classifier.get_built_contour_info():
+    for cont_info in classifier.get_built_contour_report():
         print (cont_info)
     cv2.waitKey(1)
 
