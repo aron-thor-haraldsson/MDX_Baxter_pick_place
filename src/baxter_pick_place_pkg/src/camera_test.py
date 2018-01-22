@@ -17,7 +17,7 @@ rospy.init_node('get_camera_image')
 # Defines an empty classifier class
 classifier = process_images.Classifier()
 # Trains the classifier using locally stored images
-classifier.set_train()
+classifier.set_train(False)
 left_camera = CameraController('left_hand_camera')
 left_camera.open()
 
@@ -29,7 +29,8 @@ def get_img(msg):
     classifier.set_contour_size_limits()
     classifier.classify_cam_frame(camera_image)
     cv2.imshow('image', camera_image)
-    print (classifier.get_contour_center())
+    for cont_info in classifier.get_built_contour_info():
+        print (cont_info)
     cv2.waitKey(1)
 
 def msg_to_cv(msg):

@@ -403,6 +403,8 @@ class Classifier():
         self._current_category = ""
         self._current_confidence = 0
 
+        self._built_contour_info = False
+
     def _size_check(self):
         if self.get_contour_size_limits()[1] == 0:
             self.set_contour_size_limits()
@@ -735,7 +737,14 @@ class Classifier():
         self._set_current_conficence(string_confidence)
         string_out = string_category + " (" + string_confidence + "%)"
         self._write_on_image(frame_arg, string_out, coor)
-
+        self.build_contour_info([self.get_contour_center(), self.get_current_category(), self.get_current_confidence()])
+    def build_contour_info(self, input_arg):
+        if self._built_contour_info == False:
+            self._built_contour_info = input_arg
+        else:
+            self._built_contour_info.append(input_arg)
+    def get_built_contour_info():
+        return self._built_contour_info
     def _set_current_category(self, current_category_arg):
         self._current_category = current_category_arg
     def get_current_category(self):
@@ -812,10 +821,10 @@ define_categories(range(5), ["CIR", "CRO", "SQU", "STA", "TRI"], ["Circle", "Cro
 debug_detail_level = 2
 
 # Defines an empty classifier class
-classifier = Classifier()
+#classifier = Classifier()
 # Trains the classifier using locally stored images
 # Pass in false to use prelearned model or true to relearn model
-classifier.set_train(False)
+#classifier.set_train(False)
 
 # Shows the parameters for the currently trained classifier
 #if debug_detail_level <= 1:
