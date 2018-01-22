@@ -466,7 +466,7 @@ class Contour:
         self._solidity = self.get_contourArea() / self.get_hull_area()
         self.set_bounding_rect()
         self._set_contour_center()
-        self.set_dataset()
+        #self.set_dataset()
         debug(3, "filename: ", self.get_filename())
         debug(4, "arclength: ", self.get_arcLength())
         debug(4, "contourArea: ", self.get_contourArea())
@@ -587,9 +587,6 @@ class Dataset:
         self.set_contour_feature_labels_range()
         if self._task == "train":
             self.set_target()
-            print self.target
-            print "targ"
-            sleep (1)
         self.set_data()
     def get_contour_list(self):
         return self._contour_list
@@ -597,6 +594,8 @@ class Dataset:
         target_matrix = []
         global categories
         for curr_cont in self.get_contour_list():
+            print curr.cont
+            print curr_cont.set_features()
             curr_cont.set_features()
             target_line = curr_cont.get_features()[self._shape_type_index]
             target_matrix.append(categories.return_index(target_line))
@@ -699,12 +698,15 @@ class Classifier():
 
     def _train_classifier(self, directories_arg):
         dataset_teach = self._get_all_test_data(directories_arg)
-        dataset_teach.update()
-
+        print dataset_teach._contour_list
+        print "dataset cont list"
+        print dataset_teach.data
+        print dataset_teach.target
+        sleep(0.2)
         X_all = dataset_teach.data
         y_all = dataset_teach.target
         X_train, X_test, y_train, y_test = train_test_split(X_all, y_all, test_size=0.33, random_state=42)
-        knn = KNeighborsClassifier(15)
+        knn = KNeighborsClassifier(3)
         knn.fit(X_train, y_train)
         print "-"
         print X_test
@@ -737,7 +739,7 @@ class Classifier():
 
         teach_dataset = Dataset("train")
         # for i in range (len(dirs)):
-        for i in range(20):
+        for i in range(5):
             img = Image()
             img.set_image(cv2.imread(str(dirs[i]) + str(names[i])))
             debug(5, dirs[i], names[i])
