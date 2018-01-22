@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import cv2
 import numpy as np
 from copy import deepcopy
@@ -7,7 +9,6 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.model_selection import train_test_split
 import sys
 import pickle
-
 
 cam_width = 0
 cam_height = 0
@@ -236,7 +237,7 @@ class Contour:
         self._hull_area = cv2.contourArea(cv2.convexHull(self.get_contour()))
         self._extent = self.get_contourArea() / self.get_minAreaRectArea()
         self._solidity = self.get_contourArea() / self.get_hull_area()
-        self._lengths = len(self._contour) / 100
+        self._lengths = len(self._contour)/10
         debug(3, "filename: ", self.get_filename())
         debug(4, "arclength: ", self.get_arcLength())
         debug(4, "contourArea: ", self.get_contourArea())
@@ -598,7 +599,7 @@ class Classifier():
         if conts:
             for cont in conts:
                 cont_len = cv2.arcLength(cont, True)
-                cont = cv2.approxPolyDP(cont, 0.005*cont_len, True)
+                cont = cv2.approxPolyDP(cont, 0.009*cont_len, True)
                 area = cv2.contourArea(cont)
                 if area > self.get_contour_size_limits()[0]:
                     if area < self.get_contour_size_limits()[1]:
