@@ -242,13 +242,19 @@ class Image():
                     debug(5, "Contour removed because it was too small.")
         debug(3, "Number of contours after tidying: ", len(conts_result))
         number_of_conts = len(conts_result)
+        cnts = []
         if len(conts_result) > 1:
             debug(3, "Multiple contours found.")
             debug(3, "func", "preview_image", "Multiple contours", self.get_image())
         if len(conts_result) < 1:
             debug(3, "No contours found.")
             debug(3, "func", "preview_image", "No contours", self.get_image())
-        self._contours = conts_result
+        else:
+            for cont in conts_result:
+                cnt = Contour()
+                cnt.set_contour(cont)
+                cnts.append(cnt)
+        self._contours = cnts
     def get_contours(self):
         return self._contours
     # In case there is a significant contour touching the border of the image, the two are separated with white pixels
@@ -290,12 +296,9 @@ class Image():
         if classifier_arg:
             self.set_classifier(classifier_arg)
         conts = []
-        for cont in self.get_contours():
-            print "-"
-            print self.get_classifier()
-            print "-"
-            sleep(1)
-            cont.classify_contour(self.get_classifier())
+        for cont in self._contours:
+            cont.set_classifier(self.get_classifier())
+            cont.classify_contour()
             conts.append(cont)
         self._contours = conts
     def mark_contours():
@@ -371,6 +374,7 @@ class Contour:
         self._contour_center = []
 
         self._dataset = False
+        self._classifier = False
         self._prediction = False
         self._confidence = False
 
@@ -462,6 +466,7 @@ class Contour:
         self._solidity = self.get_contourArea() / self.get_hull_area()
         self.set_bounding_rect()
         self._set_contour_center()
+        self.set_dataset()
         debug(3, "filename: ", self.get_filename())
         debug(4, "arclength: ", self.get_arcLength())
         debug(4, "contourArea: ", self.get_contourArea())
@@ -521,18 +526,26 @@ class Contour:
 
     def set_dataset(self):
         d_set = Dataset()
-        d_set.add_contour(self.get_contour())
+        d_set.add_contour(self)
         d_set.update()
         self._dataset = d_set
         if not self._classifier == False:
             self.classify_contour(self.get_classifier())
     def get_dataset(self):
         return self._dataset
-    def classify_contour(classifier_arg):
-
+    def set_classifier(self, classifier_arg):
+        self._classifier = classifier_arg
+    def get_classifier(self):
+        return self._classifier
+    def classify_contour(self, classifier_arg=False):
+        if classifier_arg:
+            self.set_classifier(classifier_arg)
+        if self.get_classifier() == False:
+            debug(2, "Classifier error: ", "no classifier when classifying contour")
+            end_program()
         X = self.get_dataset().data
-        self._prediction = classifier_arg.get_train().predict(X)
-        self._percentage = classifier_arg.get_train().predict_proba(X)
+        self._prediction = self.get_classifier().get_train().predict(X)
+        self._percentage = self.get_classifier().get_train().predict_proba(X)
 
 
 # Keeps and handles multiple contours
@@ -574,36 +587,39 @@ class Dataset:
         self.set_contour_feature_labels_range()
         if self._task == "train":
             self.set_target()
+            print self.target
+            print "targ"
+            sleep (1)
         self.set_data()
     def get_contour_list(self):
         return self._contour_list
     def set_target(self):
         target_matrix = []
         global categories
-        print len(self.get_contour_list())
-        for t in range(len(self.get_contour_list())):
-            curr_cont = self.get_contour_list()[t]
-            print curr_cont.get_contour()[t]
-            print t
-            try:
-                curr_cont.set_features()
-                target_line = curr_cont.get_features()[self._shape_type_index]
-            except:
-                print "-"
-                print curr_cont.get_features()
-                print "-"
-                print self._shape_type_index
-                print "-"
-                sleep (1)
+        for curr_cont in self.get_contour_list():
+            curr_cont.set_features()
+            target_line = curr_cont.get_features()[self._shape_type_index]
             target_matrix.append(categories.return_index(target_line))
         self.target = np.array(target_matrix)
     def set_data(self):
         data_matrix = []
-        cont_list = self.get_contour_list()
-        for c in range(len(cont_list)):
+        print self._contour_list
+        print self._list_length_current
+        print self._list_length_previous
+        print self._shape_type_index
+        print self._feature_indices
+        print self.data
+        print self.target
+        print self._categories
+        print self._task
+        sleep (0.2)
+        for curr_cont in self.get_contour_list():
             data_line = []
-            curr_cont = cont_list[c]
             for i in self._feature_indices:
+                print i
+                print curr_cont.get_features()
+                print "err"
+                sleep(0.1)
                 data_line.append(curr_cont.get_features()[i])
             data_matrix.append(data_line)
         self.data = np.array(data_matrix)
@@ -690,6 +706,10 @@ class Classifier():
         X_train, X_test, y_train, y_test = train_test_split(X_all, y_all, test_size=0.33, random_state=42)
         knn = KNeighborsClassifier(15)
         knn.fit(X_train, y_train)
+        print "-"
+        print X_test
+        print "x"
+        sleep (0.1)
         prediction = knn.predict(X_test)
 
         right = 0
@@ -717,22 +737,23 @@ class Classifier():
 
         teach_dataset = Dataset("train")
         # for i in range (len(dirs)):
-        for i in range(500):
+        for i in range(20):
             img = Image()
             img.set_image(cv2.imread(str(dirs[i]) + str(names[i])))
             debug(5, dirs[i], names[i])
             debug(4, "func", "preview_image", "Original image", img.get_image())
-            global cam_height
-            global cam_width
-            cam_height, cam_width, _ = 480, 640, 0
+            #global cam_height
+            #global cam_width
+            #cam_height, cam_width, _ = 480, 640, 0
             img.set_for_training(True)
             img.process_image()
             debug(4, "func", "preview_image", "Binarised image", img.get_binarised_image())
             conts = img.get_contours()
 
+
             nr_of_images_total += 1
             if len(conts) == 1:
-                new_contour = Contour(conts[0])
+                new_contour = conts[0]
                 new_contour.set_directory(dirs[i])
                 new_contour.set_filename(names[i])
                 new_contour.set_shape_type(shapes[i])
@@ -873,4 +894,4 @@ if debug_detail_level <= 1:
 print("Starting camera feed evaluation.")
 print("Press 'esc' to end program")
 #classifier.cam(1)
-classify_cam_feed(classifier)
+classify_cam_feed(1, classifier)
