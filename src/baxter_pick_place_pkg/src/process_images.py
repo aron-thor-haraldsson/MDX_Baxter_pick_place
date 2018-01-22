@@ -743,7 +743,7 @@ class Classifier():
             self._built_contour_info = input_arg
         else:
             self._built_contour_info.append(input_arg)
-    def get_built_contour_info():
+    def get_built_contour_info(self):
         return self._built_contour_info
     def _set_current_category(self, current_category_arg):
         self._current_category = current_category_arg
