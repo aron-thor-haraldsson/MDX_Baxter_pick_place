@@ -496,7 +496,7 @@ class Classifier():
     # returns kernel_arg <int[][]>: returns the name of every file found
     def _process_image(self, image_arg, functions_arg=[], kernel_arg=""):
         if not functions_arg:
-            functions_arg = ["gray", "increase_contrast", "open", "close"]
+            functions_arg = ["gray", "increase_contrast", "increase_contrast", "increase_contrast", "open", "close"]
         if not kernel_arg:
             kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (7, 7))
         im = deepcopy(image_arg)
