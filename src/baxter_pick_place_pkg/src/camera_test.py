@@ -23,10 +23,14 @@ left_camera.open()
 
 camera_image = None
 
+
 def get_img(msg):
     global camera_image
+    global cam_height
+    global cam_width
     camera_image = msg_to_cv(msg)
-    classifier.set_contour_size_limits()
+    cam_height, cam_width, _ = camera_image.shape
+    classifier.set_contour_size_limits(0.005, 0.6, cam_height, cam_width)
     classifier.classify_cam_frame(camera_image)
     cv2.imshow('image', camera_image)
     for cont_info in classifier.get_built_contour_info():

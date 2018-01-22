@@ -399,7 +399,7 @@ class Classifier():
         self._k_nearest_neighbour = []
         self._min_size = 0
         self._max_size = 0
-        self._contour_center = cam_width/2 , cam_height/2
+        self._contour_center = cam_height/2, cam_width/2
         self._current_category = ""
         self._current_confidence = 0
 
@@ -547,15 +547,21 @@ class Classifier():
         return dirs_out, files_out, figures_out
 
     # Sets the contour size limits in percentage of image size
-    def set_contour_size_limits(self, min_contour_size=0.005, max_contour_size=0.6):
+    def set_contour_size_limits(self, min_contour_size=0.005, max_contour_size=0.6, height_arg=0, width_arg=0):
         global max_size
         global min_size
         global cam_height
         global cam_width
-        cam_size = cam_height * cam_width
-        self._min_size = cam_size * min_contour_size
-        self._max_size = cam_size * max_contour_size
-
+        if height_arg==0 and width_arg==0:
+            cam_size = cam_height * cam_width
+        else:
+            cam_size = height_arg * width_arg
+        if cam_size>0:
+            self._min_size = cam_size * min_contour_size
+            self._max_size = cam_size * max_contour_size
+        else:
+            debug(2, "Error in dimensions: ", "frame size is set as 0")
+            end_program()
 
     def get_contour_size_limits(self):
         return self._min_size, self._max_size
@@ -643,7 +649,6 @@ class Classifier():
     # receives webcam_index_arg <int>: the index of the camera to use (optional)
     # returns: N/A
     def cam(self, webcam_index_arg=0):
-        self._size_check()
         if not self.get_train():
             debug(1, "Error, no algorithm supplied to classifier function. Unable to classify camera feed.")
             end_program()
@@ -668,6 +673,7 @@ class Classifier():
         global cam_width
         cam_height, cam_width, _ = frame.shape
         self.set_contour_size_limits()
+        self._size_check()
 
         interval = 1
         iteration = 0
@@ -718,6 +724,7 @@ class Classifier():
             return ""
         for i in range(len(conts)):
             new_contour = Contour(conts[i])
+            print conts[i]
             new_contour.set_features()
             current_dataset.add_contour(new_contour)
         return current_dataset
@@ -830,6 +837,7 @@ debug_detail_level = 2
 #if debug_detail_level <= 1:
 #    print classifier.get_train()
 # Uses the trained classifier to evaluate a camera feed
+
 #print("Starting camera feed evaluation.")
 #print("Press 'esc' to end program")
 #classifier.cam(1)
