@@ -566,7 +566,11 @@ class Classifier():
     # returns conts_result <int[]>: returns the contours that have passed the editing process
     # returns number_of_conts <int>: returns the number of contours found
     def _get_contours(self, image_arg):
-        _, conts, hierarchy = cv2.findContours(deepcopy(image_arg), cv2.RETR_LIST, cv2.CHAIN_APPROX_NONE)
+        try:
+            _, conts, hierarchy = cv2.findContours(deepcopy(image_arg), cv2.RETR_LIST, cv2.CHAIN_APPROX_NONE)
+        except ValueError:
+            conts, hierarchy = cv2.findContours(deepcopy(image_arg), cv2.RETR_LIST, cv2.CHAIN_APPROX_NONE)
+
         debug(4, "Number of contours before tidying: ", len(conts))
         conts = self._fix_if_contour_is_touching_edge(conts, image_arg)
         conts_result = []
@@ -623,7 +627,11 @@ class Classifier():
                     for j in range(thickness):
                         np_array[y, 0+j] = colour
                         np_array[y, x_max-j] = colour
-                _, conts, h = cv2.findContours(deepcopy(np_array), cv2.RETR_LIST, cv2.CHAIN_APPROX_NONE)
+                try:
+                    _, conts, h = cv2.findContours(deepcopy(np_array), cv2.RETR_LIST, cv2.CHAIN_APPROX_NONE)
+                except ValueError:
+                    conts, h = cv2.findContours(deepcopy(np_array), cv2.RETR_LIST, cv2.CHAIN_APPROX_NONE)
+
                 debug(4, "The image border was successfully separated from any intersecting contours.",
                       "This has increased the number of contours to: ", len(conts))
         return conts
