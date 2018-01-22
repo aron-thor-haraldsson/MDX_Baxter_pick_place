@@ -458,7 +458,7 @@ class Classifier():
 
         teach_dataset = Dataset("train")
         # for i in range (len(dirs)):
-        for i in range(1000):
+        for i in range(2000):
             image = cv2.imread(str(dirs[i]) + str(names[i]))
             debug(5, dirs[i], names[i])
             debug(4, "func", "preview_image", "Original image", image)
@@ -814,7 +814,8 @@ debug_detail_level = 2
 # Defines an empty classifier class
 classifier = Classifier()
 # Trains the classifier using locally stored images
-classifier.set_train(True)
+# Pass in false to use prelearned model or true to relearn model
+classifier.set_train(False)
 
 # Shows the parameters for the currently trained classifier
 #if debug_detail_level <= 1:
