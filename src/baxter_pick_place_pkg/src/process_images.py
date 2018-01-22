@@ -403,7 +403,7 @@ class Classifier():
         self._current_category = ""
         self._current_confidence = 0
 
-        self._built_contour_info = False
+        self._built_contour_report = False
 
     def _size_check(self):
         if self.get_contour_size_limits()[1] == 0:
@@ -496,7 +496,7 @@ class Classifier():
     # returns kernel_arg <int[][]>: returns the name of every file found
     def _process_image(self, image_arg, functions_arg=[], kernel_arg=""):
         if not functions_arg:
-            functions_arg = ["gray", "increase_contrast", "increase_contrast", "increase_contrast", "open", "close"]
+            functions_arg = ["gray", "increase_contrast", "close", "open", "increase_contrast"]
         if not kernel_arg:
             kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (7, 7))
         im = deepcopy(image_arg)
@@ -744,14 +744,14 @@ class Classifier():
         self._set_current_conficence(string_confidence)
         string_out = string_category + " (" + string_confidence + "%)"
         self._write_on_image(frame_arg, string_out, coor)
-        self.build_contour_info([self.get_contour_center(), self.get_current_category(), self.get_current_confidence()])
-    def build_contour_info(self, input_arg):
-        if self._built_contour_info == False:
-            self._built_contour_info = input_arg
+        self.build_contour_report([self.get_contour_center(), self.get_current_category(), self.get_current_confidence()])
+    def build_contour_report(self, input_arg):
+        if self._built_contour_report == False:
+            self._built_contour_report = input_arg
         else:
-            self._built_contour_info.append(input_arg)
-    def get_built_contour_info(self):
-        return self._built_contour_info
+            self._built_contour_report.append(input_arg)
+    def get_built_contour_report(self):
+        return self._built_contour_report
     def _set_current_category(self, current_category_arg):
         self._current_category = current_category_arg
     def get_current_category(self):
