@@ -63,7 +63,7 @@ def cartesian_move(limb_arg="left", move_type_arg="move", move_arg=default_move)
         limb_arg = "left"
     limb = baxter_interface.Limb(limb_arg)
     ik_pose = Pose() #create new pose from old one + displacements
-    if not move_type_arg == "move" or not move_type_arg == "displace":
+    if not move_type_arg == "move" and not move_type_arg == "displace":
         move_type_arg = "move"
         move_arg = default_move
     if not len(move_arg) == 3:
