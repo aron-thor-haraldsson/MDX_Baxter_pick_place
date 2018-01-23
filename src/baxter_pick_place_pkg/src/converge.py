@@ -37,10 +37,15 @@ class Converge:
         report = self.get_contour_report()
         quantity = 0
         shape = np.shape(report)
-        if shape == (3,):
+        if shape == (0,) or shape == () or shape == False:
+            quantity = 0
+        elif shape == (3,):
             quantity = 1
         elif shape[1] == 3:
             quantity = shape[0]
+        if quantity == 0:
+            curr = False, False
+            self._contour_center_h, self._contour_center_w = curr
         if quantity == 1:
             curr = self.check_report_line(report, shape_arg, conf_arg)
             if curr:
@@ -57,9 +62,7 @@ class Converge:
         else:
             return False
     def get_search_for_shape(self):
-        h, y = self._contour_center_h, self._contour_center_w
-        self.reset_all()
-        return h, y
+        return self._contour_center_h, self._contour_center_w
 
     def reset_all(self):
         self._contour_report = False
@@ -67,3 +70,4 @@ class Converge:
         self._contour_center_w = False
         self._preferred_shape = False
         self._preferred_confidence = False
+
