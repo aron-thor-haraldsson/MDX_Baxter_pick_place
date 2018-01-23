@@ -1,5 +1,5 @@
 #!/usr/bin/env python
 
-import CartesianMovement
+import cartesian_movement
 
-CartesianMovement.cartesian_move("left_arm", "displace")
+cartesian_movement.cartesian_move("left_arm", "displace")
