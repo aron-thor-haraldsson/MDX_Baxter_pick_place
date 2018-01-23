@@ -761,13 +761,14 @@ class Classifier():
         string_out = string_category + " (" + string_confidence + "%)"
         self._write_on_image(frame_arg, string_out, coor)
         self.build_contour_report([self.get_contour_center(), self.get_current_category(), self.get_current_confidence()])
-    def build_contour_report(self, input_arg):
-        if self._built_contour_report == False:
-            self._built_contour_report = input_arg
+    def build_contour_report(self, report_arg):
+        if self._built_contour_report == False or self._built_contour_report == []:
+            self._built_contour_report = report_arg
         else:
             self._built_contour_report.append(input_arg)
     def get_built_contour_report(self):
         return self._built_contour_report
+        self._bulit_contour_report = False
     def _set_current_category(self, current_category_arg):
         self._current_category = current_category_arg
     def get_current_category(self):
