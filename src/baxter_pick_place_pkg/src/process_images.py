@@ -482,7 +482,7 @@ class Classifier():
             cam_height, cam_width, _ = image.shape
             self._size_check()
             self.set_contour_size_limits()
-            image_processed = self._process_image(image)
+            image_processed = self._process_image(image, False)
             debug(4, "func", "preview_image", "Processed image", image_processed)
             cont, number = self._get_contours(image_processed)
 
@@ -698,7 +698,7 @@ class Classifier():
 
             iteration += 1
             if iteration >= interval:
-                self.classify_cam_frame(frame)
+                self.classify_cam_frame(frame, False)
                 iteration = 0
             if key == 27:  # exit on ESC
                 end_program()
@@ -707,12 +707,12 @@ class Classifier():
 
             cv2.imshow("preview", frame)
             cv2.waitKey(1)
-    def classify_cam_frame(self, frame_arg):
+    def classify_cam_frame(self, frame_arg, func_arg):
         global cam_height
         global cam_width
         cam_height, cam_width, _ = frame_arg.shape
         self.set_contour_size_limits()
-        live_dataset = self._process_frame(deepcopy(frame_arg))
+        live_dataset = self._process_frame(deepcopy(frame_arg), func_arg)
         if not live_dataset == "":
             live_dataset.update()
             X = live_dataset.data
@@ -728,10 +728,10 @@ class Classifier():
     # Processes the current video frame and turns it into contour
     # recieves frame_arg <int[]>: a raw frame to be processed
     # returns current_dataset <Dataset>: an objects that holds and handles multiple contours
-    def _process_frame(self, frame_arg):
+    def _process_frame(self, frame_arg, functions_arg):
 
 
-        frame_processed = self._process_image(frame_arg)
+        frame_processed = self._process_image(frame_arg, functions_arg)
         #preview_image("aefv", frame_processed)
         conts, number = self._get_contours(frame_processed)
         current_dataset = Dataset("estimate")
