@@ -718,6 +718,7 @@ class Classifier():
             X = live_dataset.data
             prediction = self.get_train().predict(X)
             percentage = self.get_train().predict_proba(X)
+            self.build_contour_report(False)
             for d in range(len(live_dataset.get_contour_list())):
                 self._mark_contour(frame_arg, live_dataset.get_contour_list()[d].get_contour(), prediction[d], percentage[d])
 
@@ -739,7 +740,6 @@ class Classifier():
             return ""
         for i in range(len(conts)):
             new_contour = Contour(conts[i])
-            print conts[i]
             new_contour.set_features()
             current_dataset.add_contour(new_contour)
         return current_dataset
@@ -762,13 +762,19 @@ class Classifier():
         self._write_on_image(frame_arg, string_out, coor)
         self.build_contour_report([self.get_contour_center(), self.get_current_category(), self.get_current_confidence()])
     def build_contour_report(self, report_arg):
-        if self._built_contour_report == False or self._built_contour_report == []:
+        if report_arg == False:
+            self._built_contour_report = False
+        elif self._built_contour_report == False or self._built_contour_report == []:
             self._built_contour_report = report_arg
-        else:
-            self._built_contour_report.append(report_arg)
+        elif np.shape(self._built_contour_report) == (3,):
+            self._built_contour_report = [self._built_contour_report] + [report_arg]
+        elif np.shape(self._built_contour_report)[1] == 3:
+            self._built_contour_report = self._built_contour_report + [report_arg]
+            #self._built_contour_report = np.shape(self._built_contour_report)
+
+
     def get_built_contour_report(self):
         return self._built_contour_report
-        self._bulit_contour_report = False
     def _set_current_category(self, current_category_arg):
         self._current_category = current_category_arg
     def get_current_category(self):

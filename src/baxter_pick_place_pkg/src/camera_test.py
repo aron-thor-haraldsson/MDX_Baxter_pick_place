@@ -5,7 +5,7 @@ import time
 import cv2
 import rospy
 import os
-import numpy
+import numpy as np
 os.chdir(os.path.dirname(os.path.realpath(__file__)))
 import process_images
 
@@ -34,9 +34,11 @@ def get_img(msg):
     classifier.set_contour_size_limits(0.01, 0.3, cam_height, cam_width)
     classifier.classify_cam_frame(camera_image, ["gray", "increase_contrast", "increase_contrast", "open", "close"])
     cv2.imshow('image', camera_image)
+    print classifier.get_built_contour_report()
+    print "--------------------"
     for cont_report in classifier.get_built_contour_report():
-        print (cont_report)
-        print numpy.shape(cont_report)
+        #print (cont_report)
+        pass
     cv2.waitKey(1)
 
 def msg_to_cv(msg):
