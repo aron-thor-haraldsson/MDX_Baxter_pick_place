@@ -794,7 +794,7 @@ class Classifier():
         x, y, w, h = rectangle_arg
         x_center = x + w/2
         y_center = y + h/2
-        self._contour_center = x_center, y_center
+        self._contour_center = y_center, x_center
 
 
     def get_contour_center(self):

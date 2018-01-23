@@ -9,12 +9,14 @@ import numpy as np
 os.chdir(os.path.dirname(os.path.realpath(__file__)))
 import process_images
 import converge
+import cartesian_movement
+from sys import stdout
 
 
 from baxter_interface import CameraController
 from sensor_msgs.msg import Image
 
-rospy.init_node('get_camera_image')
+rospy.init_node('grab_shape')
 
 # Defines an empty classifier class
 classifier = process_images.Classifier()
@@ -41,7 +43,11 @@ def get_img(msg):
     converger.set_contour_report(report)
 
     converger.set_search_for_shape("TRI", 80)
-    print converger.get_search_for_shape()
+    cmd = converger.build_move_command()
+    print cmd
+    if cmd[0] or cmd[1] or cmd[2]:
+        cartesian_movement.cartesian_move("left", "displace", [cmd[0], cmd[1], cmd[2]])
+        print "awv"
     print "--------------------"
 
     cv2.waitKey(1)
