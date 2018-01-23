@@ -37,12 +37,11 @@ def get_img(msg):
     classifier.set_contour_size_limits(0.01, 0.3, cam_height, cam_width)
     classifier.classify_cam_frame(camera_image, ["gray", "increase_contrast", "increase_contrast", "open", "close"])
     cv2.imshow('image', camera_image)
-    print classifier.get_built_contour_report()
-    #converger.set_contour_report(report)
+    report = classifier.get_built_contour_report()
+    converger.set_contour_report(report)
 
-    #converger.set_search_for_shape("TRI", 80)
-    #print converger.get_search_for_shape()
-    #print report
+    converger.set_search_for_shape("TRI", 80)
+    print converger.get_search_for_shape()
     print "--------------------"
 
     cv2.waitKey(1)
