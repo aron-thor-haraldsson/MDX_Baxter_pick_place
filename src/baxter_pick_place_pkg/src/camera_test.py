@@ -8,6 +8,7 @@ import os
 import numpy as np
 os.chdir(os.path.dirname(os.path.realpath(__file__)))
 import process_images
+import converge
 
 
 from baxter_interface import CameraController
@@ -19,6 +20,8 @@ rospy.init_node('get_camera_image')
 classifier = process_images.Classifier()
 # Trains the classifier using locally stored images
 classifier.set_train(False)
+converger = converge.Converge()
+converger.set_frame_dimensions()
 left_camera = CameraController('left_hand_camera')
 left_camera.open()
 
@@ -35,10 +38,13 @@ def get_img(msg):
     classifier.classify_cam_frame(camera_image, ["gray", "increase_contrast", "increase_contrast", "open", "close"])
     cv2.imshow('image', camera_image)
     print classifier.get_built_contour_report()
+    #converger.set_contour_report(report)
+
+    #converger.set_search_for_shape("TRI", 80)
+    #print converger.get_search_for_shape()
+    #print report
     print "--------------------"
-    for cont_report in classifier.get_built_contour_report():
-        #print (cont_report)
-        pass
+
     cv2.waitKey(1)
 
 def msg_to_cv(msg):

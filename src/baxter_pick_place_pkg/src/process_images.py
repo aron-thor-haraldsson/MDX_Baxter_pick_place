@@ -409,9 +409,9 @@ class Classifier():
         self._k_nearest_neighbour = []
         self._min_size = 0
         self._max_size = 0
-        self._contour_center = 0
-        self._current_category = ""
-        self._current_confidence = 0
+        self._contour_center = False
+        self._current_category = False
+        self._current_confidence = False
 
         self._built_contour_report = False
 
@@ -713,12 +713,11 @@ class Classifier():
         cam_height, cam_width, _ = frame_arg.shape
         self.set_contour_size_limits()
         live_dataset = self._process_frame(deepcopy(frame_arg), func_arg)
-        if not live_dataset == "":
+        if live_dataset:
             live_dataset.update()
             X = live_dataset.data
             prediction = self.get_train().predict(X)
             percentage = self.get_train().predict_proba(X)
-            self.build_contour_report(False)
             for d in range(len(live_dataset.get_contour_list())):
                 self._mark_contour(frame_arg, live_dataset.get_contour_list()[d].get_contour(), prediction[d], percentage[d])
 
@@ -737,7 +736,7 @@ class Classifier():
         conts, number = self._get_contours(frame_processed)
         current_dataset = Dataset("estimate")
         if number == 0:
-            return ""
+            return False
         for i in range(len(conts)):
             new_contour = Contour(conts[i])
             new_contour.set_features()
@@ -770,11 +769,18 @@ class Classifier():
             self._built_contour_report = [self._built_contour_report] + [report_arg]
         elif np.shape(self._built_contour_report)[1] == 3:
             self._built_contour_report = self._built_contour_report + [report_arg]
-            #self._built_contour_report = np.shape(self._built_contour_report)
 
 
     def get_built_contour_report(self):
-        return self._built_contour_report
+        report = self._built_contour_report
+        self.reset_report_building()
+        return report
+    def reset_report_building(self):
+        self._built_contour_report = False
+        self._contour_center = False
+        self._current_category = False
+        self._current_confidence = False
+
     def _set_current_category(self, current_category_arg):
         self._current_category = current_category_arg
     def get_current_category(self):
