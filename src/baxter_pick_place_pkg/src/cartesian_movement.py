@@ -78,10 +78,10 @@ def cartesian_move(limb_arg="left", move_type_arg="move", move_arg=default_move)
         ik_pose.position.y = current_pose['position'].y + move_arg[1]
         ik_pose.position.z = current_pose['position'].z + move_arg[2]
     # for orientation you can choose relative or absolute values
-    ik_pose.orientation.x = np.pi/2 #current_pose['orientation'].x
-    ik_pose.orientation.y = 0.0 #current_pose['orientation'].y
-    ik_pose.orientation.z = 0.0 #current_pose['orientation'].z
-    ik_pose.orientation.w = 0.0 #current_pose['orientation'].w
+    ik_pose.orientation.x = -0.707   #np.pi/2    #current_pose['orientation'].x
+    ik_pose.orientation.y = 0.707    #0.0        #current_pose['orientation'].y
+    ik_pose.orientation.z = 0        #0.0        #current_pose['orientation'].z
+    ik_pose.orientation.w = 0        #0.0        #current_pose['orientation'].w
     print ik_pose.orientation
     joint_angles = ik_request(limb_arg,ik_pose) # call the ik solver for the new pose
     if joint_angles:
