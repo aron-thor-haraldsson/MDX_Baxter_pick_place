@@ -765,7 +765,7 @@ class Classifier():
         if self._built_contour_report == False or self._built_contour_report == []:
             self._built_contour_report = report_arg
         else:
-            self._built_contour_report.append(input_arg)
+            self._built_contour_report.append(report_arg)
     def get_built_contour_report(self):
         return self._built_contour_report
         self._bulit_contour_report = False
