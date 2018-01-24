@@ -33,7 +33,7 @@ class Converge:
         self._contour_report = report_arg
     def get_contour_report(self):
         return self._contour_report
-    def set_search_for_shape(self, shape_arg="TRI", conf_arg=80):
+    def set_search_for_shape(self, shape_arg="CIR", conf_arg=80):
         report = self.get_contour_report()
         quantity = 0
         shape = np.shape(report)
