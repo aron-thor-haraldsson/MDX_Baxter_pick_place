@@ -79,9 +79,9 @@ class Converge:
         if y_cont == False or x_cont == False:
             return False, False
         else:
-            if x_diff < 2:
+            if abs(x_diff) < 2:
                 x_diff = 0
-            if x_diff < 2:
+            if (x_diff) < 2:
                 y_diff = 0
             return y_diff, x_diff
 
