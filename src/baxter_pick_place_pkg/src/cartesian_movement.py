@@ -15,14 +15,17 @@ from geometry_msgs.msg import (
 	)
 
 from std_msgs.msg import Header
+from std_msgs.msg import String
 
 from baxter_core_msgs.srv import (
 	SolvePositionIK,
 	SolvePositionIKRequest,
 	)
-
+rospy.init_node("rsdk_ik_service_client")
 # the default coordinates to use for the left arm if not specified
 default_move = [0.069,0.841,0.1145]
+
+flag_beginning = True
 
 # Checks wheter a given pose is valid
 #   limb_arg takes the limb name, "left" or "right"
@@ -58,7 +61,6 @@ def ik_request(limb_arg,pose_arg):
 #       default value is "move"
 #   move_arg takes an array of 3 elements that will be used for movement
 def cartesian_move(limb_arg="left", move_type_arg="move", move_arg=default_move):
-    rospy.init_node("rsdk_ik_service_client")
     if not limb_arg=="left" or not limb_arg=="right":
         limb_arg = "left"
     limb = baxter_interface.Limb(limb_arg)
@@ -86,13 +88,60 @@ def cartesian_move(limb_arg="left", move_type_arg="move", move_arg=default_move)
     joint_angles = ik_request(limb_arg,ik_pose) # call the ik solver for the new pose
     if joint_angles:
         limb.move_to_joint_positions(joint_angles) # move to new joint coordinates
+def move_command(data):
+    string = data.data[1:-1]
+    string_array = string.split(', ')
+    if string_array == ["False", "False", "False"]:
+        print "no shape detected, and thus no movement required"
+        pass
+    else:
+        float_array = [float(string_array[0]), float(string_array[1]), float(string_array[2])]
+        if float_array == [0.0, 0.0, 0.0]:
+            print "the gripper is centered over the shape"
+            # proceed to execute pick and place procedure
+            pick_place()
+        else:
+            print "shape detected, move Baxter arm towards shape"
+            cartesian_move("left", "displace", float_array)
+def pick_place():
+    move_down()
+    grab()
+    move_up()
+    move_home()
+    move_down()
+    release()
+    move_home()
+
+def move_down():
+    cartesian_move("left", "displace", [0, 0, -0.1])
+def move_up():
+    pass
+    #cartesian_move("left", "displace", [0, 0, -0.1])
+def move_home():
+    pass
+def grab():
+    pass
+def release():
+    pass
+
 
 def main():
+    global flag_beginning
+    if flag_beginning:
+        cartesian_move()
+        print "initalized"
+        flag_beginning = False
+    #print "before subscriber"
+    rospy.Subscriber("/converge", String, move_command, queue_size=1)
+    #print "after subscriber"
+    rospy.spin()
+    #print "after spin"
     #limb = 'left'
     #movement = [-0.2,0.0,0.0]#[0,0.303,-0.303]
     #moveCartesianSpace(limb,movement)
     pass
 
 if __name__ == '__main__':
-   	 sys.exit(main())
+    main()
+   	#sys.exit(main())
 
