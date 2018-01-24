@@ -87,7 +87,11 @@ def cartesian_move(limb_arg="left", move_type_arg="move", move_arg=default_move)
     print ik_pose.orientation
     joint_angles = ik_request(limb_arg,ik_pose) # call the ik solver for the new pose
     if joint_angles:
-        limb.move_to_joint_positions(joint_angles) # move to new joint coordinates
+        try:
+            limb.move_to_joint_positions(joint_angles) # move to new joint coordinates
+        except ROSException:
+            print "Error: trying to publish to a closed topic"
+            print "       this is probablly due to the script being closed down"
 def move_command(data):
     string = data.data[1:-1]
     string_array = string.split(', ')
