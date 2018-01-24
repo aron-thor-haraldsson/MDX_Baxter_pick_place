@@ -38,7 +38,7 @@ def get_img(msg):
     camera_image = msg_to_cv(msg)
     cam_height, cam_width, _ = camera_image.shape
     classifier.set_contour_size_limits(0.01, 0.3, cam_height, cam_width)
-    classifier.classify_cam_frame(camera_image, ["gray", "increase_contrast", "increase_contrast", "open", "close"])
+    classifier.classify_cam_frame(camera_image, ["gray", "increase_contrast", "increase_contrast", "increase_contrast", "open", "close"])
     cv2.imshow('image', camera_image)
     report = classifier.get_built_contour_report()
     print report

@@ -125,11 +125,13 @@ def pick_place():
         global decent_increment
         decent_increment -= 1
     elif decent_increment == 0:
-        move_down(0.16)
+        #move_down(0.16)
+        move_down(0.2)
         grab()
         move_up()
         move_home()
-        move_down(0.26)
+        #move_down(0.26)
+        move_down(0.29)
         release()
         move_up()
         move_home()

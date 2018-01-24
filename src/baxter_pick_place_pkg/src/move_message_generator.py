@@ -76,8 +76,8 @@ class Move_Message:
         y_frame, x_frame = self.get_frame_center()
         y_diff = y_frame - y_cont
         x_diff = x_cont- x_frame
-        y_diff = y_diff - 140
-        x_diff = x_diff - 30
+        y_diff = y_diff - 50
+        x_diff = x_diff -15 # a higher value results in a more positive Baxter arm movement in x direction(forward)
         if y_cont == False or x_cont == False:
             return -1000, -1000
         else:
@@ -97,12 +97,15 @@ class Move_Message:
         if abs(y) == -1000 or x == -1000:
             return [-1000, -1000, -1000]
         else:
+
             x = x/div
             y = y/div
-            if x < 0.003:
+            print x, y
+            if abs(x) < 0.003:
                 x = 0.0
-            if y < 0.003:
+            if abs(y) < 0.003:
                 y = 0.0
+            print x, y
             if y == 0 and x == 0:
                 return [0.0, 0.0, 0.0]
             elif y == True:
