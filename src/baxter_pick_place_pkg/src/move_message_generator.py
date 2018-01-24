@@ -3,7 +3,7 @@
 import numpy as np
 
 # This class is receives the centerpoint of the
-class Converge:
+class Move_Message:
     def __init__(self):
         self._frame_height=False
         self._frame_width=False
@@ -25,7 +25,7 @@ class Converge:
             self._frame_height = w_arg
             self._frame_center_w = w_arg/2
         else:
-            debug(2, "Error: ", "set_frame_dimensions in Converge received one or more 0 values")
+            debug(2, "Error: ", "set_frame_dimensions in Move_Message received one or more 0 values")
             end_program()
     def get_frame_center(self):
         return [self._frame_center_h, self._frame_center_w]

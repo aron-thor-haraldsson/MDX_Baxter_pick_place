@@ -8,7 +8,7 @@ import os
 import numpy as np
 os.chdir(os.path.dirname(os.path.realpath(__file__)))
 import process_images
-import converge
+import move_message_generator
 from sys import stdout
 
 
@@ -23,8 +23,8 @@ pub = rospy.Publisher('/converge', String, queue_size=1)
 classifier = process_images.Classifier()
 # Trains the classifier using locally stored images
 classifier.set_train(False)
-converger = converge.Converge()
-converger.set_frame_dimensions()
+move_message = move_message_generator.Move_Message()
+move_message.set_frame_dimensions()
 left_camera = CameraController('left_hand_camera')
 left_camera.open()
 
@@ -42,10 +42,10 @@ def get_img(msg):
     cv2.imshow('image', camera_image)
     report = classifier.get_built_contour_report()
     print report
-    converger.set_contour_report(report)
+    move_message.set_contour_report(report)
 
-    converger.set_search_for_shape("CIR", 80)
-    cmd = converger.build_move_command()
+    move_message.set_search_for_shape("CIR", 80)
+    cmd = move_message.build_move_command()
     print cmd
     if cmd[0] or cmd[1] or cmd[2]:
         pass
