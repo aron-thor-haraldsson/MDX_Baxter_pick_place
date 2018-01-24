@@ -33,7 +33,7 @@ class Move_Message:
         self._contour_report = report_arg
     def get_contour_report(self):
         return self._contour_report
-    def set_search_for_shape(self, shape_arg="CIR", conf_arg=80):
+    def set_search_for_shape(self, shape_arg="TRI", conf_arg=80):
         report = self.get_contour_report()
         quantity = 0
         shape = np.shape(report)
@@ -77,7 +77,7 @@ class Move_Message:
         y_diff = y_frame - y_cont
         x_diff = x_cont- x_frame
         y_diff = y_diff - 50
-        x_diff = x_diff -15 # a higher value results in a more positive Baxter arm movement in x direction(forward)
+        x_diff = x_diff -17 # a higher value results in a more positive Baxter arm movement in x direction(forward)
         if y_cont == False or x_cont == False:
             return -1000, -1000
         else:
@@ -101,9 +101,9 @@ class Move_Message:
             x = x/div
             y = y/div
             print x, y
-            if abs(x) < 0.003:
+            if abs(x) < 0.0045:
                 x = 0.0
-            if abs(y) < 0.003:
+            if abs(y) < 0.0045:
                 y = 0.0
             print x, y
             if y == 0 and x == 0:

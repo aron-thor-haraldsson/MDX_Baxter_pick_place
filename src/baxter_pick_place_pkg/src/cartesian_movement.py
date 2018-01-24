@@ -27,8 +27,10 @@ rospy.init_node("rsdk_ik_service_client")
 default_move = [0.069,0.841,0.1145]
 
 flag_beginning = True
-decent_increment = 3
+process_status = -1
 gripper = baxter_interface.Gripper("left")
+pub = rospy.Publisher('/user_feedback', String, queue_size=1)
+rate = rospy.Rate(100)
 
 # Checks wheter a given pose is valid
 #   limb_arg takes the limb name, "left" or "right"
@@ -64,6 +66,9 @@ def ik_request(limb_arg,pose_arg):
 #       default value is "move"
 #   move_arg takes an array of 3 elements that will be used for movement
 def cartesian_move(limb_arg="left", move_type_arg="move", move_arg=default_move):
+    global process_status
+    if process_status == -1:
+        return -1
     if not limb_arg=="left" or not limb_arg=="right":
         limb_arg = "left"
     limb = baxter_interface.Limb(limb_arg)
@@ -92,6 +97,11 @@ def cartesian_move(limb_arg="left", move_type_arg="move", move_arg=default_move)
     if joint_angles:
         limb.move_to_joint_positions(joint_angles) # move to new joint coordinates
 def move_command(data):
+    print "stuck"
+    global process_status
+    if process_status < 0:
+        return -1
+    "not stuck"
     string = data.data[1:-1]
     string_array = string.split(', ')
     if string_array == ["-1000", "-1000", "-1000"]:
@@ -106,8 +116,7 @@ def move_command(data):
             # proceed to execute pick and place procedure
             pick_place()
         else:
-            global decent_increment
-            if decent_increment == 0:
+            if process_status == 0:
                 print "too close to determine approximate location"
                 if float_array[0] == 0.0:
                     " attempt to center on x axis successful"
@@ -119,25 +128,25 @@ def move_command(data):
                 print "shape detected, move Baxter arm towards shape"
                 cartesian_move("left", "displace", float_array)
 def pick_place():
-    global decent_increment
-    if decent_increment > 0:
+    global process_status
+    if process_status > 0:
         move_down()
-        global decent_increment
-        decent_increment -= 1
-    elif decent_increment == 0:
-        #move_down(0.16)
-        move_down(0.2)
+        global process_status
+        process_status -= 1
+    elif process_status == 0:
+        #move_down(0.16) #this was for the previous table in Ritterman building
+        move_down(0.2) # this is for the tables in the Grove
         grab()
         move_up()
         move_home()
-        #move_down(0.26)
-        move_down(0.29)
+        #move_down(0.26) #this was for the previous table in Ritterman building
+        move_down(0.29) #this is for the tables in the Grove
         release()
         move_up()
         move_home()
-        global decent_increment
-        decent_increment = -1
-    print "decent_increment" + str(decent_increment)
+        global process_status
+        process_status = -1
+    print "process_status" + str(process_status)
 
 def move_down(down_arg=0.05):
     z = -down_arg
@@ -157,11 +166,18 @@ def release():
     global gripper
     gripper.open()
     time.sleep(0.5)
-
+def user_input(data):
+    string = data.data
+    global flag_beginning
+    global process_status
+    flag_beginning = True
+    process_status = 3
 
 def main():
-    global flag_beginning
-    if flag_beginning:
+    global process_status
+    if process_status < 0:
+
+    else:
         cartesian_move()
         global gripper
         gripper.calibrate()
@@ -169,15 +185,18 @@ def main():
         flag_beginning = False
     #print "before subscriber"
     rospy.Subscriber("/converge", String, move_command, queue_size=1)
+    rospy.Subscriber("/user_input", String, user_input, queue_size=1)
     #print "after subscriber"
     rospy.spin()
     #print "after spin"
     #limb = 'left'
     #movement = [-0.2,0.0,0.0]#[0,0.303,-0.303]
     #moveCartesianSpace(limb,movement)
-    #decent_increment = 3
+    #process_status = 3
     #flag_beginning = True
 
 if __name__ == '__main__':
-   	sys.exit(main())
+    global process_status
+    process_status = -1
+    sys.exit(main())
 

@@ -18,7 +18,7 @@ from std_msgs.msg import String
 
 rospy.init_node('track_shape')
 pub = rospy.Publisher('/converge', String, queue_size=1)
-
+rate = rospy.Rate(100)
 # Defines an empty classifier class
 classifier = process_images.Classifier()
 # Trains the classifier using locally stored images
@@ -29,6 +29,7 @@ left_camera = CameraController('left_hand_camera')
 left_camera.open()
 
 camera_image = None
+preferred_shape = "CRO"
 
 
 def get_img(msg):
@@ -41,32 +42,34 @@ def get_img(msg):
     classifier.classify_cam_frame(camera_image, ["gray", "increase_contrast", "increase_contrast", "increase_contrast", "open", "close"])
     cv2.imshow('image', camera_image)
     report = classifier.get_built_contour_report()
-    print report
     move_message.set_contour_report(report)
 
-    move_message.set_search_for_shape("CIR", 80)
+    global preferred_shape
+    move_message.set_search_for_shape(preferred_shape, 80)
     cmd = move_message.build_move_command()
-    print cmd
     if cmd[0] or cmd[1] or cmd[2]:
         pass
         #cartesian_movement.cartesian_move("left", "displace", [cmd[0], cmd[1], cmd[2]])
         #print "awv"
-    print "--------------------"
     if not rospy.is_shutdown():
+        global rate
         pub.publish(str(cmd))
-
+        rate.sleep()
     cv2.waitKey(1)
 
 
 def msg_to_cv(msg):
     return cv_bridge.CvBridge().imgmsg_to_cv2(msg)
+def user_input(data):
+    global preferred_shape
+    preferred_shape = data.data
 
-camera_subscriber = rospy.Subscriber( 'cameras/left_hand_camera/image', Image, get_img)
+rospy.Subscriber( 'cameras/left_hand_camera/image', Image, get_img)
+rospy.Subscriber( '/user_input', String, user_input)
 
 while camera_image==None:
     pass
 
-#print camera_image
 
 rospy.spin()
 
