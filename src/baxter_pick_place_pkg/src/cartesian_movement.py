@@ -91,9 +91,11 @@ def cartesian_move(limb_arg="left", move_type_arg="move", move_arg=default_move)
 def move_command(data):
     string = data.data[1:-1]
     string_array = string.split(', ')
-    if string_array == ["False", "False", "False"]:
+    if string_array == ["-1000", "-1000", "-1000"]:
         print "no shape detected, and thus no movement required"
         pass
+    elif string_array == ["True", "True", "True"]:
+        print "the gripper is now centered over the target"
     else:
         float_array = [float(string_array[0]), float(string_array[1]), float(string_array[2])]
         if float_array == [0.0, 0.0, 0.0]:

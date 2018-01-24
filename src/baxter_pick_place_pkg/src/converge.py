@@ -77,11 +77,11 @@ class Converge:
         y_diff = y_frame - y_cont
         x_diff = x_frame - x_cont
         if y_cont == False or x_cont == False:
-            return False, False
+            return -1000, -1000
         else:
-            if abs(x_diff) < 2:
+            if abs(x_diff) < 1:
                 x_diff = 0
-            if abs(x_diff) < 2:
+            if abs(x_diff) < 1:
                 y_diff = 0
             return y_diff, x_diff
 
@@ -89,7 +89,17 @@ class Converge:
         y, x = self.calculate_yx_diff()
         #print y
         #print x
-        if y == False or x == False:
-            return [False, False, False]
+        div = 2000.0
+
+        if abs(y) == -1000 or x == -1000:
+            return [-1000, -1000, -1000]
         else:
-            return [x/2500.0, y/2500.0, 0.0]
+            x = -x
+            if y == 0 and x == 0:
+                return [0.0, 0.0, 0.0]
+            elif y == True:
+                return [x/div, 0, 0.0]
+            elif x == True:
+                return [0, y/div, 0.0]
+            else:
+                return [x/div, y/div, 0.0]
