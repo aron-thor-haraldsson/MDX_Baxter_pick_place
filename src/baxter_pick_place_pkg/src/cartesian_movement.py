@@ -129,7 +129,7 @@ def pick_place():
         grab()
         move_up()
         move_home()
-        move_down(0.3)
+        move_down(0.26)
         release()
         move_up()
         move_home()
