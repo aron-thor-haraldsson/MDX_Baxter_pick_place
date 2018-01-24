@@ -76,12 +76,13 @@ class Converge:
         y_frame, x_frame = self.get_frame_center()
         y_diff = y_frame - y_cont
         x_diff = x_frame - x_cont
+        y_diff = y_diff-20
         if y_cont == False or x_cont == False:
             return -1000, -1000
         else:
-            if abs(x_diff) < 1:
+            if abs(x_diff) < 2:
                 x_diff = 0
-            if abs(x_diff) < 1:
+            if abs(x_diff) < 2:
                 y_diff = 0
             return y_diff, x_diff
 
@@ -95,11 +96,14 @@ class Converge:
             return [-1000, -1000, -1000]
         else:
             x = -x
+            x = x/div
+            y = y/div
+
             if y == 0 and x == 0:
                 return [0.0, 0.0, 0.0]
             elif y == True:
-                return [x/div, 0, 0.0]
+                return [x, 0, 0.0]
             elif x == True:
-                return [0, y/div, 0.0]
+                return [0, y, 0.0]
             else:
-                return [x/div, y/div, 0.0]
+                return [x, y, 0.0]
