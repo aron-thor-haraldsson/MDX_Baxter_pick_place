@@ -9,14 +9,15 @@ import numpy as np
 os.chdir(os.path.dirname(os.path.realpath(__file__)))
 import process_images
 import converge
-import cartesian_movement
 from sys import stdout
 
 
 from baxter_interface import CameraController
 from sensor_msgs.msg import Image
+from std_msgs.msg import String
 
-rospy.init_node('grab_shape')
+rospy.init_node('track_shape')
+pub = rospy.Publisher('/converge', String, queue_size=1)
 
 # Defines an empty classifier class
 classifier = process_images.Classifier()
@@ -40,17 +41,22 @@ def get_img(msg):
     classifier.classify_cam_frame(camera_image, ["gray", "increase_contrast", "increase_contrast", "open", "close"])
     cv2.imshow('image', camera_image)
     report = classifier.get_built_contour_report()
+    print report
     converger.set_contour_report(report)
 
     converger.set_search_for_shape("TRI", 80)
     cmd = converger.build_move_command()
     print cmd
     if cmd[0] or cmd[1] or cmd[2]:
-        cartesian_movement.cartesian_move("left", "displace", [cmd[0], cmd[1], cmd[2]])
-        print "awv"
+        pass
+        #cartesian_movement.cartesian_move("left", "displace", [cmd[0], cmd[1], cmd[2]])
+        #print "awv"
     print "--------------------"
+    if not rospy.is_shutdown():
+        pub.publish(str(cmd))
 
     cv2.waitKey(1)
+
 
 def msg_to_cv(msg):
     return cv_bridge.CvBridge().imgmsg_to_cv2(msg)

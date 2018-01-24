@@ -74,8 +74,8 @@ class Converge:
     def calculate_yx_diff(self):
         y_cont, x_cont = self.get_search_for_shape()
         y_frame, x_frame = self.get_frame_center()
-        y_diff = y_cont - y_frame
-        x_diff = x_cont - x_frame
+        y_diff = y_frame - y_cont
+        x_diff = x_frame - x_cont
         if y_cont == False or x_cont == False:
             return False, False
         else:
@@ -87,8 +87,9 @@ class Converge:
 
     def build_move_command(self):
         y, x = self.calculate_yx_diff()
+        #print y
+        #print x
         if y == False or x == False:
             return [False, False, False]
         else:
-            return [x/5000.0, y/5000.0, 0.0]
-
+            return [x/2500.0, y/2500.0, 0.0]
