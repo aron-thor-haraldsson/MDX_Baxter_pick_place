@@ -44,7 +44,7 @@ def get_img(msg):
     print report
     converger.set_contour_report(report)
 
-    converger.set_search_for_shape("TRI", 80)
+    converger.set_search_for_shape("CIR", 80)
     cmd = converger.build_move_command()
     print cmd
     if cmd[0] or cmd[1] or cmd[2]:

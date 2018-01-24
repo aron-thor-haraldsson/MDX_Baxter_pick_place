@@ -6,6 +6,7 @@ import baxter_interface
 import tf
 import struct
 import numpy as np
+import time
 
 from geometry_msgs.msg import (
 	PoseStamped,
@@ -26,6 +27,8 @@ rospy.init_node("rsdk_ik_service_client")
 default_move = [0.069,0.841,0.1145]
 
 flag_beginning = True
+decent_increment = 3
+gripper = baxter_interface.Gripper("left")
 
 # Checks wheter a given pose is valid
 #   limb_arg takes the limb name, "left" or "right"
@@ -84,7 +87,7 @@ def cartesian_move(limb_arg="left", move_type_arg="move", move_arg=default_move)
     ik_pose.orientation.y = 0.707    #0.0        #current_pose['orientation'].y
     ik_pose.orientation.z = 0        #0.0        #current_pose['orientation'].z
     ik_pose.orientation.w = 0        #0.0        #current_pose['orientation'].w
-    print ik_pose.orientation
+    #print ik_pose.orientation
     joint_angles = ik_request(limb_arg,ik_pose) # call the ik solver for the new pose
     if joint_angles:
         limb.move_to_joint_positions(joint_angles) # move to new joint coordinates
@@ -103,34 +106,63 @@ def move_command(data):
             # proceed to execute pick and place procedure
             pick_place()
         else:
-            print "shape detected, move Baxter arm towards shape"
-            cartesian_move("left", "displace", float_array)
+            global decent_increment
+            if decent_increment == 0:
+                print "too close to determine approximate location"
+                if float_array[0] == 0.0:
+                    " attempt to center on x axis successful"
+                    pick_place()
+                else:
+                    print " attempting to cetner on x axis"
+                    cartesian_move("left", "displace", [float_array[0], 0.0, 0.0])
+            else:
+                print "shape detected, move Baxter arm towards shape"
+                cartesian_move("left", "displace", float_array)
 def pick_place():
-    move_down()
-    grab()
-    move_up()
-    move_home()
-    move_down()
-    release()
-    move_home()
+    global decent_increment
+    if decent_increment > 0:
+        move_down()
+        global decent_increment
+        decent_increment -= 1
+    elif decent_increment == 0:
+        move_down(0.16)
+        grab()
+        move_up()
+        move_home()
+        move_down(0.3)
+        release()
+        move_up()
+        move_home()
+        global decent_increment
+        decent_increment = -1
+    print "decent_increment" + str(decent_increment)
 
-def move_down():
-    cartesian_move("left", "displace", [0, 0, -0.1])
-def move_up():
-    pass
-    #cartesian_move("left", "displace", [0, 0, -0.1])
+def move_down(down_arg=0.05):
+    z = -down_arg
+    cartesian_move("left", "displace", [0, 0, z])
+    print "moving down"
+def move_up(up_arg=0.2):
+    cartesian_move("left", "displace", [0, 0, 0.2])
 def move_home():
-    pass
+    cartesian_move()
 def grab():
-    pass
+    time.sleep(0.5)
+    global gripper
+    gripper.close()
+    time.sleep(0.5)
 def release():
-    pass
+    time.sleep(0.5)
+    global gripper
+    gripper.open()
+    time.sleep(0.5)
 
 
 def main():
     global flag_beginning
     if flag_beginning:
         cartesian_move()
+        global gripper
+        gripper.calibrate()
         print "initalized"
         flag_beginning = False
     #print "before subscriber"
@@ -141,9 +173,9 @@ def main():
     #limb = 'left'
     #movement = [-0.2,0.0,0.0]#[0,0.303,-0.303]
     #moveCartesianSpace(limb,movement)
-    pass
+    #decent_increment = 3
+    #flag_beginning = True
 
 if __name__ == '__main__':
-    main()
-   	#sys.exit(main())
+   	sys.exit(main())
 
