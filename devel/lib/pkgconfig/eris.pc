@@ -1,8 +1,0 @@
-prefix=/media/ronnamura/Data/school/GitBash/baxter_pick_place_ws/devel
-
-Name: eris
-Description: Description of eris
-Version: 0.0.0
-Cflags: 
-Libs: -L/media/ronnamura/Data/school/GitBash/baxter_pick_place_ws/devel/lib 
-Requires: 

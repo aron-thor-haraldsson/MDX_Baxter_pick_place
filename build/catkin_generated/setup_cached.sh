@@ -7,4 +7,6 @@
 # new environment variables
 
 # modified environment variables
+export LD_LIBRARY_PATH="/home/ronnamura/baxter_ws/devel/lib:/home/ronnamura/fix_stage_ws/devel/lib:/home/ronnamura/ronnamura_ws/devel/lib:/opt/ros/kinetic/lib:/opt/ros/kinetic/lib/x86_64-linux-gnu"
+export PKG_CONFIG_PATH="/home/ronnamura/baxter_ws/devel/lib/pkgconfig:/home/ronnamura/fix_stage_ws/devel/lib/pkgconfig:/home/ronnamura/ronnamura_ws/devel/lib/pkgconfig:/opt/ros/kinetic/lib/pkgconfig:/opt/ros/kinetic/lib/x86_64-linux-gnu/pkgconfig"
 export PWD="/media/ronnamura/Data/school/GitBash/baxter_pick_place_ws/build"

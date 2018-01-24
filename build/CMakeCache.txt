@@ -253,12 +253,6 @@ _CATKIN_GTEST_SRC:FILEPATH=/usr/src/gtest/src/gtest.cc
 catkin_DIR:PATH=/opt/ros/kinetic/share/catkin/cmake
 
 //Value Computed by CMake
-eris_BINARY_DIR:STATIC=/media/ronnamura/Data/school/GitBash/baxter_pick_place_ws/build/eris
-
-//Value Computed by CMake
-eris_SOURCE_DIR:STATIC=/media/ronnamura/Data/school/GitBash/baxter_pick_place_ws/src/eris
-
-//Value Computed by CMake
 gtest_BINARY_DIR:STATIC=/media/ronnamura/Data/school/GitBash/baxter_pick_place_ws/build/gtest
 
 //Dependencies for the target
