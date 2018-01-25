@@ -101,9 +101,9 @@ class Move_Message:
             x = x/div
             y = y/div
             print x, y
-            if abs(x) < 0.0045:
+            if abs(x) < 0.0055:
                 x = 0.0
-            if abs(y) < 0.0045:
+            if abs(y) < 0.0055:
                 y = 0.0
             print x, y
             if y == 0 and x == 0:
