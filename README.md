@@ -52,3 +52,42 @@ https://youtu.be/y2IjncEcM5o
 Maintainers:
 
 Aron Haraldsson - ronnamura@gmail.com
+
+
+
+FAQ/Troubleshooting:
+
+Problem:
+    The robot arm starts a routine, but gets stuck during centering or descent.
+Solution:
+    The centering process is too precise to be carried out by your Baxter.
+    Edit the 'move_message_generator.py' lines 111 and 113
+    so that the values (default is 0.0055) are increased slightly.
+    If you increase these values too much,
+    the centering process will become increasingly inaccurate.
+
+Problem:
+    The shape is incorrectly classified.
+Solution:
+    You may have to relearn the ML algorithm.
+    You can run the 'relearn_model.py' to do this.
+    Note that every time you do this, results vary.
+
+Problem:
+    There is one huge contour (larger than the actual shape on the video)
+    or there are multiple contours detected.
+Solution:
+    There is too much clutter on the work area.
+    Try to remove or cover up all coloured parts so that the work area is white.
+    Try to eliminate shadows cast on the table by provide better lighting
+    from multiple angles.
+    Alternatively, if you are feeling confident and have read and understood
+    how image preprocessing is performed in 'process_images.py', you can
+    start to tweak the parameters passed in the function call in line 62
+    in the 'track_shape.py' file.
+
+Problem:
+    The cube is outside the field of view of the Baxter camera arm.
+Solution:
+    Move the cube inside the field of view
+    or pull the Baxter arm to a position where it can see the cube.
