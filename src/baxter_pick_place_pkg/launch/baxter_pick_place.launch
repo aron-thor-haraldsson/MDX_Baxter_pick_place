@@ -1,4 +1,4 @@
-<!-- This launch file may not currently work -->
+<!-- This launch file launches all the nodes needed to use the pick and place program -->
 <launch>
   <node name="track_shape" pkg="baxter_pick_place_pkg" type="track_shape.py"/>
   <node name="cartesian_movement" pkg="baxter_pick_place_pkg" type="cartesian_movement.py"/>
