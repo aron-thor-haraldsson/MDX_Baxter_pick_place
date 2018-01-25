@@ -91,3 +91,14 @@ Problem:
 Solution:
     Move the cube inside the field of view
     or pull the Baxter arm to a position where it can see the cube.
+
+Problem:
+    During descent, the Baxter arms moves to far or too short
+    to successfully pick up the cube.
+Solution:
+    Edit the 'cartesian_movement.py' file.
+    There, find the pick_place() function.
+    In it you can tweak the two move_down() function arguments.
+    The argument in first call should be 0.1 less than the argument in the second call.
+    The argument in the second call should be the distance, in meters,
+    between the table and the tip of the gripper on the Baxter arm.
