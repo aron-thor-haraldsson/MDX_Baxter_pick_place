@@ -25,16 +25,6 @@ vc = cv2.VideoCapture()
 debug_detail_level = 2
 
 
-# Closes all windows and ends the program
-# reveives: N/A
-# returns: N/A
-def end_program():
-    cv2.destroyAllWindows()
-    global vc
-    vc.release()
-    sys.exit(0)
-
-
 # This class remembers all the categories available
 # This information is stored as:    integer format as indices
 #                                   string format as 3 letter abbreviations
@@ -118,12 +108,12 @@ class Categories():
                 return i
             elif self.get_text(i) == input_arg:
                 return i
-
-
         debug(1, "Did not recognise -", input_arg, "- as a valid value for category conversion.")
         end_program()
 
+
 # Stores a contour and all relevant information about it
+# This includes all of the features extracted from it
 class Contour:
     def __init__(self, contour_arg=[]):
         self._contour = contour_arg
@@ -217,7 +207,6 @@ class Contour:
             elif features_labels[i] == "lengths":
                 feature_data.append(self.get_lengths())
 
-
         self._feature_data = feature_data
     def get_features(self):
         return self._feature_data
@@ -284,7 +273,8 @@ class Contour:
     def get_lengths(self):
         return self._lengths
 
-# Keeps and handles multiple contours
+# Keeps and handles multiple contour objects
+# Also generates a dataset that can be used by a ML algorithm
 class Dataset:
     def __init__(self, task_arg=""):
         self._contour_list = []
@@ -352,52 +342,6 @@ class Dataset:
         self._categories = categories
 
 
-# This function prints debug messages if the message is important enough
-# receives msg_detail_level_arg <int>: important the current debug message is
-# receives arg0_arg <str>: a part of the message that will be concatenated to a combined string (optional)
-# receives arg1_arg <str>: ditto
-# receives arg2_arg <str>: ditto
-# receives arg3_arg <str>: ditto
-# receives arg4_arg <str>: ditto
-# returns N/A
-# Alternatively, this function can run other functions given by string value
-#   in that case:
-#       arg1_arg <str>: needs to be set to "func"
-#       arg2_arg <str>: the name of the function to be called
-#       arg3_arg <str>: the first argument for the function to be called
-#       arg3_arg <str>: the second argument for the function to be called
-def debug(msg_detail_level_arg=0, arg0_arg="", arg1_arg="", arg2_arg="", arg3_arg="", arg4_arg=""):
-    if msg_detail_level_arg <= debug_detail_level:
-        if arg0_arg == "func":
-            if len(arg1_arg):
-                function_to_call = globals()[arg1_arg]  # Get the function
-                if arg2_arg:
-                    if len(arg3_arg):
-                        if arg4_arg:
-                            function_to_call(arg2_arg, arg3_arg, arg4_arg)  # call it
-                        else:
-                            function_to_call(arg2_arg, arg3_arg)
-                    else:
-                        function_to_call(arg2_arg)
-                return
-            else:
-                "Invalid use of debug function. Failed to use the debug function to call another function."
-        else:
-            print "Debug detail level " + str(msg_detail_level_arg) + " - " + str(arg0_arg) + str(arg1_arg) + str(arg2_arg) + str(arg3_arg) + str(arg4_arg)
-            return
-
-
-# Displays a preview of the current state of the image for debug purposes
-# receives title_arg <str>: the title of the window that shows the image
-# receives image_arg <image>: the image object to be shown
-def preview_image(title_arg, image_arg):
-    if not title_arg:
-        title_arg = "Preview"
-    cv2.imshow(title_arg, image_arg)
-    cv2.waitKey(0)
-    cv2.destroyWindow(title_arg)
-
-
 # This class handles all classification for teaching and estimation purposes
 # create an object without arguments to get an empty class of this type, then you can manipulate it via methods
 # call the 'set_train' method to train the algorithm with locally stored images
@@ -412,12 +356,13 @@ class Classifier():
         self._contour_center = False
         self._current_category = False
         self._current_confidence = False
-
         self._built_contour_report = False
 
     def _size_check(self):
         if self.get_contour_size_limits()[1] == 0:
             self.set_contour_size_limits()
+
+    # Gets and sets the trained model
     def set_train(self, new_arg=False, directories_arg=""):
         filename = 'knn_model.sav'
         if new_arg:
@@ -430,11 +375,8 @@ class Classifier():
         else:
             self._k_nearest_neighbour = pickle.load(open(filename, 'rb'))
             debug(2, "Machine learning model successfullyl loaded from file")
-
-
     def get_train(self):
         return self._k_nearest_neighbour
-
 
     def _train_classifier(self, directories_arg):
         dataset_teach = self._get_all_test_data(directories_arg)
@@ -469,7 +411,6 @@ class Classifier():
         nr_of_images_total = 0
         nr_of_images_kept = 0
 
-
         teach_dataset = Dataset("train")
         for i in range (len(dirs)):
         #for i in range(1000):
@@ -501,7 +442,6 @@ class Classifier():
 
         debug(2, "For training purposes, ", nr_of_images_kept, " images kept out of ", nr_of_images_total)
         return teach_dataset
-
 
     # Pre-processes the image with certain tools in a specific order
     # receives image_arg <image>: the relative paths that you want to include in the search
@@ -538,7 +478,6 @@ class Classifier():
         th, im_thresh = cv2.threshold(im, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
         return im_thresh
 
-
     # Generates a list of paths of image files that can be used for processing
     # receives directories_arg <str[]>: the relative paths that you want to include in the search
     # returns dir_out <str[]>: returns the directory of every file found
@@ -559,7 +498,7 @@ class Classifier():
             os.chdir(starting_dir)
         return dirs_out, files_out, figures_out
 
-    # Sets the contour size limits in percentage of image size
+    # Sets and gets the contour size limits in percentage of image size
     def set_contour_size_limits(self, min_contour_size=0.005, max_contour_size=0.6, height_arg=0, width_arg=0):
         global max_size
         global min_size
@@ -575,10 +514,8 @@ class Classifier():
         else:
             debug(2, "Error in dimensions: ", "frame size is set as 0")
             end_program()
-
     def get_contour_size_limits(self):
         return self._min_size, self._max_size
-
 
     # Gets the contours of an image
     # receives image_arg <image>: the image you want to extract contours from
@@ -587,6 +524,7 @@ class Classifier():
     # returns conts_result <int[]>: returns the contours that have passed the editing process
     # returns number_of_conts <int>: returns the number of contours found
     def _get_contours(self, image_arg):
+        # This error catcher eliminates some of the errors generated when using different versions of Python
         try:
             _, conts, hierarchy = cv2.findContours(deepcopy(image_arg), cv2.RETR_LIST, cv2.CHAIN_APPROX_NONE)
         except ValueError:
@@ -617,7 +555,6 @@ class Classifier():
             debug(3, "No contours found.")
             debug(3, "func", "preview_image", "No contours", image_arg)
         return conts_result, number_of_conts
-
 
     # In case there is a significant contour touching the border of the image, the two are separated with white pixels
     # receives contours_arg <int[]>: the contour list of an image
@@ -659,7 +596,6 @@ class Classifier():
                       "This has increased the number of contours to: ", len(conts))
         return conts
 
-
     # Commences grabbing of webcam feed followed by feed classification
     # receives webcam_index_arg <int>: the index of the camera to use (optional)
     # returns: N/A
@@ -669,12 +605,10 @@ class Classifier():
             end_program()
         self._classify_cam_feed(webcam_index_arg)
 
-
     # Captures video frames and sends it to processing, followed by contour estimation and contour marking
     # receives webcam_index_arg <int>: the index of the camera to use
     # returns: N/A
     def _classify_cam_feed(self, webcam_index_arg):
-
         rval = False
         cv2.namedWindow("preview")
         global vc
@@ -683,7 +617,6 @@ class Classifier():
             rval, frame = vc.read()
         else:
             rval = False
-
         global cam_height
         global cam_width
         cam_height, cam_width, _ = frame.shape
@@ -702,11 +635,9 @@ class Classifier():
                 iteration = 0
             if key == 27:  # exit on ESC
                 end_program()
-
-
-
             cv2.imshow("preview", frame)
             cv2.waitKey(1)
+
     def classify_cam_frame(self, frame_arg, func_arg):
         global cam_height
         global cam_width
@@ -721,16 +652,10 @@ class Classifier():
             for d in range(len(live_dataset.get_contour_list())):
                 self._mark_contour(frame_arg, live_dataset.get_contour_list()[d].get_contour(), prediction[d], percentage[d])
 
-
-
-
-
     # Processes the current video frame and turns it into contour
     # recieves frame_arg <int[]>: a raw frame to be processed
     # returns current_dataset <Dataset>: an objects that holds and handles multiple contours
     def _process_frame(self, frame_arg, functions_arg):
-
-
         frame_processed = self._process_image(frame_arg, functions_arg)
         #preview_image("aefv", frame_processed)
         conts, number = self._get_contours(frame_processed)
@@ -743,7 +668,7 @@ class Classifier():
             current_dataset.add_contour(new_contour)
         return current_dataset
 
-
+    # This visually marks the current contour on the image
     def _mark_contour(self, frame_arg, contour_arg, prediction_arg, percentage_arg):
         global categories
 
@@ -760,6 +685,8 @@ class Classifier():
         string_out = string_category + " (" + string_confidence + "%)"
         self._write_on_image(frame_arg, string_out, coor)
         self.build_contour_report([self.get_contour_center(), self.get_current_category(), self.get_current_confidence()])
+
+    # These build, get and reset the reports on where all the contours are on the current frame
     def build_contour_report(self, report_arg):
         if report_arg == False:
             self._built_contour_report = False
@@ -769,8 +696,6 @@ class Classifier():
             self._built_contour_report = [self._built_contour_report] + [report_arg]
         elif np.shape(self._built_contour_report)[1] == 3:
             self._built_contour_report = self._built_contour_report + [report_arg]
-
-
     def get_built_contour_report(self):
         report = self._built_contour_report
         self.reset_report_building()
@@ -790,17 +715,16 @@ class Classifier():
     def get_current_confidence(self):
         return self._current_confidence
 
+    # Sets and gets the coordinates of the center of the current contour
     def _set_contour_center(self, rectangle_arg):
         x, y, w, h = rectangle_arg
         x_center = x + w/2
         y_center = y + h/2
         self._contour_center = y_center, x_center
-
-
     def get_contour_center(self):
         return self._contour_center
 
-
+    # Writes classification and confidence of the current contour on the image
     def _write_on_image(self, frame_arg=[], text_arg="", coordinate_arg="", colour_arg=[]):
         if len(frame_arg) < 1:
             debug(1, "No frame detected during write_on_image function call.")
@@ -828,6 +752,15 @@ class Classifier():
         cv2.putText(frame_arg, text_arg, lower_left_corner, font, fontScale, colour_arg, line_type)
 
 
+# Displays a preview of the current state of the image for debug purposes
+# receives title_arg <str>: the title of the window that shows the image
+# receives image_arg <image>: the image object to be shown
+def preview_image(title_arg, image_arg):
+    if not title_arg:
+        title_arg = "Preview"
+    cv2.imshow(title_arg, image_arg)
+    cv2.waitKey(0)
+    cv2.destroyWindow(title_arg)
 
 
 # Creates and populates a class that takes care of all conversions of category types
@@ -843,9 +776,50 @@ def define_categories(ind_arg, abbr_arg, text_arg):
     categories.set_texts(text_arg)
 
 
+# This function prints debug messages if the message is important enough
+# receives msg_detail_level_arg <int>: important the current debug message is
+# receives arg0_arg <str>: a part of the message that will be concatenated to a combined string (optional)
+# receives arg1_arg <str>: ditto
+# receives arg2_arg <str>: ditto
+# receives arg3_arg <str>: ditto
+# receives arg4_arg <str>: ditto
+# returns N/A
+# Alternatively, this function can run other functions given by string value
+#   in that case:
+#       arg1_arg <str>: needs to be set to "func"
+#       arg2_arg <str>: the name of the function to be called
+#       arg3_arg <str>: the first argument for the function to be called
+#       arg3_arg <str>: the second argument for the function to be called
+def debug(msg_detail_level_arg=0, arg0_arg="", arg1_arg="", arg2_arg="", arg3_arg="", arg4_arg=""):
+    if msg_detail_level_arg <= debug_detail_level:
+        if arg0_arg == "func":
+            if len(arg1_arg):
+                function_to_call = globals()[arg1_arg]  # Get the function
+                if arg2_arg:
+                    if len(arg3_arg):
+                        if arg4_arg:
+                            function_to_call(arg2_arg, arg3_arg, arg4_arg)  # call it
+                        else:
+                            function_to_call(arg2_arg, arg3_arg)
+                    else:
+                        function_to_call(arg2_arg)
+                return
+            else:
+                "Invalid use of debug function. Failed to use the debug function to call another function."
+        else:
+            print "Debug detail level " + str(msg_detail_level_arg) + " - " + str(arg0_arg) + str(arg1_arg) + str(arg2_arg) + str(arg3_arg) + str(arg4_arg)
+            return
 
-                        # Down here is the main code.
-                        # Everything else is just classes and functions
+
+# Closes all windows and ends the program
+# reveives: N/A
+# returns: N/A
+def end_program():
+    cv2.destroyAllWindows()
+    global vc
+    vc.release()
+    sys.exit(0)
+
 
 # Defining the available classification categories
 define_categories(range(5), ["CIR", "CRO", "SQU", "STA", "TRI"], ["Circle", "Cross", "Square", "Star", "Triangle"])
@@ -855,18 +829,3 @@ define_categories(range(5), ["CIR", "CRO", "SQU", "STA", "TRI"], ["Circle", "Cro
 #   setting it to 5 gives you feedback in multiple loops throughout the code (not adviced)
 #   setting it in between 0 and 5 gives amount of feedback relative to those extremes
 debug_detail_level = 2
-
-# Defines an empty classifier class
-#classifier = Classifier()
-# Trains the classifier using locally stored images
-# Pass in false to use prelearned model or true to relearn model
-#classifier.set_train(True)
-
-# Shows the parameters for the currently trained classifier
-#if debug_detail_level <= 1:
-#    print classifier.get_train()
-# Uses the trained classifier to evaluate a camera feed
-
-#print("Starting camera feed evaluation.")
-#print("Press 'esc' to end program")
-#classifier.cam(1)
