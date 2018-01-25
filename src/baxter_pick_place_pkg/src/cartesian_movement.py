@@ -176,8 +176,9 @@ def user_input(data):
 def main():
     global process_status
     if process_status < 0:
-
+        print "stu"
     else:
+        print "st"
         cartesian_move()
         global gripper
         gripper.calibrate()
