@@ -2,5 +2,5 @@
 <launch>
   <node name="track_shape" pkg="baxter_pick_place_pkg" type="track_shape.py"/>
   <node name="cartesian_movement" pkg="baxter_pick_place_pkg" type="cartesian_movement.py"/>
-  <node name="user_interface" pkg="baxter_pick_place_pkg" type="user_interface.py"/>
+  <node name="user_interface" pkg="baxter_pick_place_pkg" type="user_interface.py" output="screen"/>
 </launch>
