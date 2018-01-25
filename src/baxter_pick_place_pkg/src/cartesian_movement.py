@@ -8,12 +8,7 @@ import struct
 import numpy as np
 import time
 
-from geometry_msgs.msg import (
-	PoseStamped,
-	Pose,
-	Point,
-	Quaternion,
-	)
+from geometry_msgs.msg import (PoseStamped, Pose, Point, Quaternion)
 
 from std_msgs.msg import Header
 from std_msgs.msg import String
@@ -23,10 +18,17 @@ from baxter_core_msgs.srv import (
 	SolvePositionIKRequest,
 	)
 rospy.init_node("rsdk_ik_service_client")
-# the default coordinates to use for the left arm if not specified
+# the default home coordinates to use for the left arm if not specified
 default_move = [0.069,0.841,0.1145]
 
+# Process status is as global variable that keeps track of where in the pick and place
+# routine the baxter arm is
+#   a value of -1 means that it has not started it's first task or it has just completed a task
+#   a value of 4 means that it has just received a task and is about to go to home position and calibrate the grippers
+#   the values 1 to 3 are used during the slow initial descent towards the target shape
+#   a value of 0 means that the arm will now complete the rest of the pick and place routine
 process_status = -1
+#an object that handles Baxter's left gripper
 gripper = baxter_interface.Gripper("left")
 
 # Checks wheter a given pose is valid
@@ -90,6 +92,73 @@ def cartesian_move(limb_arg="left", move_type_arg="move", move_arg=default_move)
     joint_angles = ik_request(limb_arg,ik_pose) # call the ik solver for the new pose
     if joint_angles:
         limb.move_to_joint_positions(joint_angles) # move to new joint coordinates
+
+# the pick and place routine
+# different sections of it get called depending on how far it has gotten in the routine
+def pick_place():
+    global process_status
+    if process_status == 4:
+        initialise()
+        process_status = 3
+    elif process_status > 0 and process_status < 4:
+        move_down()
+        process_status -= 1
+    elif process_status == 0:
+        move_down(0.16) #this was for the previous table in Ritterman building
+        #move_down(0.2) # this is for the tables in the Grove
+        grab()
+        move_up()
+        move_home()
+        move_down(0.26) #this was for the previous table in Ritterman building
+        #move_down(0.29) #this is for the tables in the Grove
+        release()
+        move_up()
+        move_home()
+        process_status = -1
+    print "process_status" + str(process_status)
+
+# is called when a new task is recieved, this initializes the gripper
+def initialise():
+    move_home()
+    global gripper
+    gripper.calibrate()
+    print "initalized"
+# moves the arm down a set amount
+# the default value is used during slow descent
+def move_down(down_arg=0.05):
+    z = -down_arg
+    cartesian_move("left", "displace", [0, 0, z])
+    print "moving down"
+# moves the arm up a set amount
+# the default value is used after manipulating an object to clear the workspace
+# before the next move is initiated
+def move_up(up_arg=0.2):
+    cartesian_move("left", "displace", [0, 0, 0.2])
+# moves to the default home position
+def move_home():
+    cartesian_move()
+# closes the gripper on the arm
+def grab():
+    time.sleep(0.5)
+    global gripper
+    gripper.close()
+    time.sleep(0.5)
+# opens the gripper on the arm
+def release():
+    time.sleep(0.5)
+    global gripper
+    gripper.open()
+    time.sleep(0.5)
+
+# this is called ever time 'user_interface' publishes on "/user_input"
+# it resets all values to initiate the next routine
+def user_input(data):
+    print "A new user input has been received"
+    print "Reset all processes and start over"
+    global process_status
+    process_status = 4
+
+# the command that is called every time track_shapes publishes a new command on '/converge' topic
 def move_command(data):
     #print "stuck"
     global process_status
@@ -125,67 +194,13 @@ def move_command(data):
             else:
                 print "shape detected, move Baxter arm towards shape"
                 cartesian_move("left", "displace", float_array)
-def pick_place():
-    global process_status
-    if process_status == 4:
-        initialise()
-        process_status = 3
-    elif process_status > 0 and process_status < 4:
-        move_down()
-        process_status -= 1
-    elif process_status == 0:
-        move_down(0.16) #this was for the previous table in Ritterman building
-        #move_down(0.2) # this is for the tables in the Grove
-        grab()
-        move_up()
-        move_home()
-        move_down(0.26) #this was for the previous table in Ritterman building
-        #move_down(0.29) #this is for the tables in the Grove
-        release()
-        move_up()
-        move_home()
-        process_status = -1
-    print "process_status" + str(process_status)
-
-def initialise():
-    move_home()
-    global gripper
-    gripper.calibrate()
-    print "initalized"
-def move_down(down_arg=0.05):
-    z = -down_arg
-    cartesian_move("left", "displace", [0, 0, z])
-    print "moving down"
-def move_up(up_arg=0.2):
-    cartesian_move("left", "displace", [0, 0, 0.2])
-def move_home():
-    cartesian_move()
-def grab():
-    time.sleep(0.5)
-    global gripper
-    gripper.close()
-    time.sleep(0.5)
-def release():
-    time.sleep(0.5)
-    global gripper
-    gripper.open()
-    time.sleep(0.5)
-def user_input(data):
-    print "user input"
-    string = data.data
-    global process_status
-    process_status = 4
 
 def main():
+    # this subscriber listens to move commands from 'track_shape'
     rospy.Subscriber("/converge", String, move_command, queue_size=1)
+    # this subscriber listens to new requests from 'user_interface'
     rospy.Subscriber("/user_input", String, user_input, queue_size=1)
     rospy.spin()
-    #print "after spin"
-    #limb = 'left'
-    #movement = [-0.2,0.0,0.0]#[0,0.303,-0.303]
-    #moveCartesianSpace(limb,movement)
-    #process_status = 3
 
 if __name__ == '__main__':
     sys.exit(main())
-
