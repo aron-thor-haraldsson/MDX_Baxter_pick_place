@@ -154,3 +154,19 @@ Solution:
     Make sure that you have entered Baxters address
     in the 'baxter_hostname' variable in line 23
     in the 'baxter.sh' file before you run it.
+
+Problem:
+    The gripper descends on the cube
+    with an incorrect orientation,
+    making the gripper collide with the cube corners.
+Solution:
+    The code is not designed to mimic the orientation of the cube.
+    Due to image processing limitations,
+    detecting the orientation of the cube was deemed unfeasible.
+    You will need to make sure the orientation of the cube
+    matches the orientation of the gripper in it's home position.
+    Alternatively, you can edit the code in 'cartesian_movement.py'.
+    The function in question is 'cartesian_move()'
+    and you need to change the values of 'ikpose.orientation'.
+    To do this you should be knowledgable about
+    the quaternion number system.
