@@ -1,5 +1,12 @@
 #!/usr/bin/env python
 
+## This file recieves information about all the contours detected,
+## removes all but the shape that the user is interested in
+## and generates a message indicating the direction and magnitude of
+## motion that the Baxter arm needs to perform to be able to
+## centre over the target shape.
+
+
 import numpy as np
 
 # This class is receives the centerpoint of the

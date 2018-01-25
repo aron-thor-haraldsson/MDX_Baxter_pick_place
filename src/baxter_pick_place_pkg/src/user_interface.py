@@ -1,5 +1,8 @@
 #!/usr/bin/env python
 
+## This file is a simple user interface that is used
+## to control the other nodes required to perform a pick and place routine.
+
 import sys
 import rospy
 import time

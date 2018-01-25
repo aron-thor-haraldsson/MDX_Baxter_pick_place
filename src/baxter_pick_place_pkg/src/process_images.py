@@ -1,5 +1,9 @@
 #!/usr/bin/env python
 
+## This file handles all image preprocessing and machine learning.
+## It receives images and spits out recognised contours
+## and their positions on the images.
+
 import cv2
 import numpy as np
 from copy import deepcopy

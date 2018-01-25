@@ -1,5 +1,9 @@
 #!/usr/bin/env python
 
+## This file handles the Baxter arm move routines
+## it recieves information about where to go to centre over the desired object
+## and then performs a pick and place routine
+
 import sys
 import rospy
 import baxter_interface

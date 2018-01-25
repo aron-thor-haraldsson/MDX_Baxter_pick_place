@@ -1,5 +1,8 @@
 #!/usr/bin/env python
 
+## This file imports all the required files to turn a video feed into
+## move commands that are then sent to be processed and sent to the Baxter arm
+
 import cv_bridge
 import time
 import cv2
