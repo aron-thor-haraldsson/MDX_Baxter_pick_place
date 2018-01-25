@@ -116,7 +116,7 @@ variable to reflect your current IP address.\n"
 	if [ -z "${your_ip}" ] && [ -z "${your_hostname}" ]; then
 		echo -ne "EXITING - Please edit this file, modifying to specify \
 your_ip or your_hostname.\n"
-		exit 1	
+		exit 1
 	fi
 
 	# verify specified ros version is installed
