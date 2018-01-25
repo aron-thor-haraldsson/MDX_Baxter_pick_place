@@ -6,6 +6,7 @@ that the Baxter arm then picks up and relocates.
 
 
 
+
 Requirements/Installation:
 
 - a Baxter robot that is fully set up and functional (2)
@@ -28,6 +29,23 @@ Requirements/Installation:
 (1) https://askubuntu.com/questions/666631/how-can-i-dual-boot-windows-10-and-ubuntu-on-a-uefi-hp-notebook
 (2) http://sdk.rethinkrobotics.com/wiki/Baxter_Setup
 (3) http://wiki.ros.org/kinetic/Installation/Ubuntu
+
+
+
+Usage:
+
+When everything is set up as described in the above steps,
+perform the following steps to use the package:
+- go to your workspace
+- execute 'baxter.sh'
+- rosrun 'enable.py -e' from the package 'baxter_tools'
+- rosrun 'tuck.py -u' from the package 'baxter_tools'
+- roslaunch the 'baxter_pick_place.launch' from the package 'baxter_pick_place_pkg'
+- enjoy
+
+Here are a couple of youtube video links that demonstrate how the code should work:
+https://youtu.be/VWPVNY-5a0w
+https://youtu.be/y2IjncEcM5o
 
 
 
