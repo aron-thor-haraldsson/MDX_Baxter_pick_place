@@ -102,3 +102,12 @@ Solution:
     The argument in first call should be 0.1 less than the argument in the second call.
     The argument in the second call should be the distance, in meters,
     between the table and the tip of the gripper on the Baxter arm.
+
+Problem:
+    The gripper consistently misses the cube or collides with it.
+Solution:
+    Edit the 'move_message_generator.py' file.
+    In line 86 and 87 'y_diff' and 'x_diff',
+    the numerical values can be tweaked a bit.
+    This affects how the arm centres on the target.
+    Be careful, since this is a very fiddly setting to manipulate.
