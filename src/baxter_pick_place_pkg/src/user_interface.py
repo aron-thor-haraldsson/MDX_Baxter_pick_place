@@ -38,5 +38,5 @@ if __name__ == '__main__':
     print "Please input 3 letter abbreviation now."
     #global rate
     #rate = rospy.Rate(100)
-    rospy.Subscriber( '/user_feedback', Bool, ready_for_pick_and_place)
+    rospy.Subscriber( '/user_feedback', String, ready_for_pick_and_place)
     main()
