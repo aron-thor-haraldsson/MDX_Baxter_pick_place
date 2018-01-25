@@ -1,6 +1,6 @@
 <!-- This launch file may not currently work -->
 <launch>
-  <node name="track_contour" pkg="baxter_pick_place_pkg" type="track_contour.py"/>
+  <node name="track_contour" pkg="baxter_pick_place_pkg" type="track_shape.py"/>
   <node name="cartesian_movement" pkg="baxter_pick_place_pkg" type="cartesian_movement.py"/>
   <node name="user_interface" pkg="baxter_pick_place_pkg" type="user_interface.py"/>
 </launch>
