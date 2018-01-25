@@ -10,12 +10,16 @@ pub = rospy.Publisher('/user_input', String, queue_size=1)
 
 def main():
     while not rospy.is_shutdown():
+        # Gets the user input
         user_input = str(raw_input())
+        # Publishes the user input to 'track_shape' and 'cartesian_movement'
         pub.publish(user_input)
 
+
+# This introduction gets printed on startup, so the user knows
+# how to use the interface
 if __name__ == '__main__':
     rospy.init_node('user_interface')
-    busy = False
     print "When the robot is idle at home position,"
     print "you can type a capital letter abbreviation"
     print "of the shape you desire to pick up."
