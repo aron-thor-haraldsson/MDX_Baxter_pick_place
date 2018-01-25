@@ -18,7 +18,6 @@ from std_msgs.msg import String
 
 rospy.init_node('track_shape')
 pub = rospy.Publisher('/converge', String, queue_size=1)
-rate = rospy.Rate(100)
 # Defines an empty classifier class
 classifier = process_images.Classifier()
 # Trains the classifier using locally stored images
@@ -34,8 +33,6 @@ preferred_shape = "CRO"
 
 def get_img(msg):
     global camera_image
-    #global cam_height
-    #global cam_width
     camera_image = msg_to_cv(msg)
     cam_height, cam_width, _ = camera_image.shape
     classifier.set_contour_size_limits(0.01, 0.3, cam_height, cam_width)
@@ -47,14 +44,8 @@ def get_img(msg):
     global preferred_shape
     move_message.set_search_for_shape(preferred_shape, 80)
     cmd = move_message.build_move_command()
-    if cmd[0] or cmd[1] or cmd[2]:
-        pass
-        #cartesian_movement.cartesian_move("left", "displace", [cmd[0], cmd[1], cmd[2]])
-        #print "awv"
     if not rospy.is_shutdown():
-        global rate
         pub.publish(str(cmd))
-        rate.sleep()
     cv2.waitKey(1)
 
 
@@ -66,10 +57,6 @@ def user_input(data):
 
 rospy.Subscriber( 'cameras/left_hand_camera/image', Image, get_img)
 rospy.Subscriber( '/user_input', String, user_input)
-
-while camera_image==None:
-    pass
-
 
 rospy.spin()
 
