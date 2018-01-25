@@ -1,5 +1,9 @@
 #!/usr/bin/env python
 
+## This file is for testing purposes only.
+## This allows you to experiment with sending
+## custom move commands to the Baxter arm.
+
 import sys
 import rospy
 import baxter_interface
@@ -63,11 +67,12 @@ def moveCartesianSpace(limb_arg,displacement):
         limb.move_to_joint_positions(joint_angles) # move to new joint coordinates
 
 def main():
-    #limb = 'left'
-    #movement = [-0.2,0.0,0.0]#[0,0.303,-0.303]
-    #moveCartesianSpace(limb,movement)
-    moveCartesianSpace("left", [0, 0.1, 0])
-    #cartesian_movement.cartesian_move()
+    # specifies which limb to move, 'left' or 'right'
+    limb = 'left'
+    # specifies how far to move in relation to the current position, xyz
+    movement = [-0.2,0.0,0.0]
+    # performs the movement
+    moveCartesianSpace(limb,movement)
 
 if __name__ == '__main__':
    	 sys.exit(main())
