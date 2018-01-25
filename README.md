@@ -138,3 +138,19 @@ Solution:
     and be familiar with the quaternion number system.
     You need to modify the last few lines
     in the 'cartesian_move()' function.
+
+Problem:
+    This error appears when you try to launch the program.
+    "Unable to contact my own server at ..."
+Solution:
+    Make sure that you have entered your own ip address
+    in the 'your_ip' variable in line 27
+    in the 'baxter.sh' file before you run it.
+
+Problem:
+    This error appears when you try to launch the program.
+    "ERROR: unable to contact ROS master at ..."
+Solution:
+    Make sure that you have entered Baxters address
+    in the 'baxter_hostname' variable in line 23
+    in the 'baxter.sh' file before you run it.
