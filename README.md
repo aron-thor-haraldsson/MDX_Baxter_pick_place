@@ -111,3 +111,30 @@ Solution:
     the numerical values can be tweaked a bit.
     This affects how the arm centres on the target.
     Be careful, since this is a very fiddly setting to manipulate.
+
+Problem:
+    You want the Baxter to use the opposite arm instead.
+Solution:
+    Edit the 'cartesian_movement.py' file.
+    Go to where 'cartesian_move()' is declared in line 71.
+    Change the default value of the 'limb_arg' argument
+    to either "left" or "right".
+
+Problem:
+    You want to change the 'home' position of the Baxter arm.
+Solution:
+    Edit the 'cartesian_movement.py' file.
+    Go to where 'default_move' variable is assigned in line 26.
+    It is an array containing the x, y and z coordinates
+    of the default 'home' position.
+    Change these values as you see fit.
+
+Problem:
+    You want the orientation of the baxter arm to be something
+    else than pointing straight down.
+Solution:
+    Edit the 'cartesian_movement.py' file.
+    You should really know what you are doing
+    and be familiar with the quaternion number system.
+    You need to modify the last few lines
+    in the 'cartesian_move()' function.
