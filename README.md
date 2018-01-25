@@ -58,6 +58,13 @@ Aron Haraldsson - ronnamura@gmail.com
 FAQ/Troubleshooting:
 
 Problem:
+    I do not know how to set up the physical environment of Baxter
+    for proper use of this pick and place program.
+Solution:
+    Refer to the physical_environment.md file in the workspace root directory
+    for a better description.
+
+Problem:
     The robot arm starts a routine, but gets stuck during centering or descent.
 Solution:
     The centering process is too precise to be carried out by your Baxter.
