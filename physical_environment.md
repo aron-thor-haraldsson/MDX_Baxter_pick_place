@@ -10,3 +10,6 @@ The other cube has pieces of paper attached to 5 sides, each with an image of a 
 The shapes are Circle, Triangle, Cross, Star and Square.
 The shapes are solid black with a white background.
 The cube with the shapes on it is placed so the gripper comes down and can grabs the flat sides and not the corners.
+
+Examples of the shapes that the ML model can recognize
+can be found in the 'teach_images' folder
