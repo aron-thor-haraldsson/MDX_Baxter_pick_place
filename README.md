@@ -16,6 +16,7 @@ Requirements/Installation:
 - the computer needs to have ROS (3)
 - the computer needs to have Baxter Workstation on it (2)
 - the 'baxter.sh' from the workspace root directory should be copied to your workspace
+- the same applies to the 'README.md' and 'physical_environment.md'
 - the 'baxter.sh' needs to be modified to include the address of your computer and Baxter
 - the package 'baxter_pick_place_pkg' should also be added to the src directory of your workspace
 - the 'devel' and 'build' folders of the workspace do not need to be copied
