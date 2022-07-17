@@ -52,7 +52,7 @@ https://youtu.be/y2IjncEcM5o
 
 Maintainers:
 
-Aron Haraldsson - ronnamura@gmail.com
+Aron Haraldsson - aron.thor.haraldsson@gmail.com
 
 
 
